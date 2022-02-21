@@ -1,12 +1,15 @@
 val DottyVersion = "3.1.1"
 val ReactorVersion = "3.4.15"
 
+githubTokenSource := TokenSource.GitConfig("github.token")
+githubOwner := "unseen-research"
+githubRepository := "urwerk-source"
+
 lazy val root = project
   .in(file("."))
   .settings(
     name := "urwerk-source",
     description := "Urwerk - reactive library",
-    version := "0.1.0",
 
     scalaVersion := DottyVersion,
     scalacOptions ++= Seq(
