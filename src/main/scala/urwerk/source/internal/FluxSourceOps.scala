@@ -4,6 +4,7 @@ import java.util.concurrent.Flow
 import java.util.function.{BiConsumer, BiFunction}
 
 import org.reactivestreams.FlowAdapters
+import org.reactivestreams.Publisher
 
 import reactor.adapter.JdkFlowAdapter
 import reactor.core.publisher.Flux
@@ -15,7 +16,6 @@ import scala.concurrent.ExecutionContext
 import scala.jdk.FunctionConverters.*
 import scala.jdk.CollectionConverters.*
 
-import urwerk.concurrent.given
 import urwerk.source.reactor.FluxConverters.*
 import urwerk.source.Optional
 import urwerk.source.Singleton
@@ -23,7 +23,6 @@ import urwerk.source.Source
 import urwerk.source.Signal
 import urwerk.source.internal.given
 import urwerk.source.BufferOverflowStrategy
-import org.reactivestreams.Publisher
 
 private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
   type  S[+ _]
