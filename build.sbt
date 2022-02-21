@@ -5,7 +5,7 @@ val DottyVersion = "3.1.1"
 val ReactorVersion = "3.4.15"
 
 githubOwner := "unseen-research"
-githubRepository := "urwerk-source"
+githubRepository := "urwerk"
 githubTokenSource := TokenSource.GitConfig("github.token")
 
 lazy val root = project
