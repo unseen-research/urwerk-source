@@ -6,4 +6,4 @@ publishMavenStyle := true
 
 licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
-publishTo := sonatypePublishToBundle.value
+//publishTo :=  Some("nexus" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")   //sonatypePublishToBundle.value

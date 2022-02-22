@@ -1,5 +1,5 @@
 ThisBuild / organization := "io.github.unseen-research"
-ThisBuild / version      := "0.1.2"
+ThisBuild / version      := "0.1.2-SNAPSHOT"
 
 val DottyVersion = "3.1.1"
 val ReactorVersion = "3.4.15"
@@ -45,7 +45,7 @@ lazy val urwerkSource = project
       "io.projectreactor" % "reactor-test" % ReactorVersion % "test"
     ),
 
-    publishTo := sonatypePublishToBundle.value
+    publishTo :=  Some("nexus" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
   )
 
 lazy val urwerkSourceTest = (project in file("test"))
@@ -59,7 +59,7 @@ lazy val urwerkSourceTest = (project in file("test"))
     libraryDependencies ++= commonDependencies ++ Seq(
       "io.projectreactor" % "reactor-test" % ReactorVersion % "compile"
     ),
-    publishTo := sonatypePublishToBundle.value
+    publishTo :=  Some("nexus" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
   )
   .dependsOn(
     urwerkSource
