@@ -16,8 +16,8 @@ import scala.jdk.FunctionConverters.given
 import urwerk.source.BackPressureStrategy
 import urwerk.source.Source
 import urwerk.source.reactor.FluxConverters.*
-import urwerk.source.Optional
-import urwerk.source.Singleton
+import urwerk.source.OptionSource
+import urwerk.source.SingletonSource
 import urwerk.source.Signal
 import urwerk.source.Sink
 import urwerk.source.SourceFactory

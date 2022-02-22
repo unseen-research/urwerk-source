@@ -3,8 +3,8 @@ package urwerk.source.test
 import _root_.reactor.test.StepVerifier
 import _root_.reactor.test.StepVerifier.FirstStep
 
-import urwerk.source.Optional
-import urwerk.source.Singleton
+import urwerk.source.OptionSource
+import urwerk.source.SingletonSource
 import urwerk.source.Source
 
 import urwerk.source.reactor.FluxConverters.*
@@ -16,29 +16,29 @@ object SourceVerifier:
   def apply[A](source: Source[A]): FirstStep[A] = 
     apply(source, Long.MaxValue)
   
-object SingletonVerifier:
+object SingletonSourceVerifier:
 
-  def apply[A](source: Singleton[A], request: Long): FirstStep[A] = 
+  def apply[A](source: SingletonSource[A], request: Long): FirstStep[A] = 
     StepVerifier.create(source.toFlux, request)
 
-  def apply[A](source: Singleton[A]): FirstStep[A] = 
+  def apply[A](source: SingletonSource[A]): FirstStep[A] = 
     apply(source, Long.MaxValue)
 
-object OptionalVerifier:
+object OptionSourceVerifier:
 
-  def apply[A](source: Optional[A], request: Long): FirstStep[A] = 
+  def apply[A](source: OptionSource[A], request: Long): FirstStep[A] = 
     StepVerifier.create(source.toFlux, request)
 
-  def apply[A](source: Optional[A]): FirstStep[A] = 
+  def apply[A](source: OptionSource[A]): FirstStep[A] = 
     apply(source, Long.MaxValue)
 
 extension[A](source: Source[A])
   def toVerifier  = SourceVerifier(source)
 
-extension[A](source: Singleton[A])
+extension[A](source: SingletonSource[A])
   def assertSingleton = source
-  def toVerifier  = SingletonVerifier(source)
+  def toVerifier  = SingletonSourceVerifier(source)
 
-extension[A](source: Optional[A])
+extension[A](source: OptionSource[A])
   def assertOptional = source
-  def toVerifier  = OptionalVerifier(source)
+  def toVerifier  = OptionSourceVerifier(source)

@@ -50,15 +50,15 @@ trait Source[+A]:
 
   def flatMap[B](concurrency: Int, prefetch: Int)(op: A => Source[B]): Source[B]
 
-  def foldLeft[B](start: B)(op: (B, A) => B): Singleton[B]
+  def foldLeft[B](start: B)(op: (B, A) => B): SingletonSource[B]
 
-  def head: Singleton[A]
+  def head: SingletonSource[A]
 
-  def headOption: Optional[A]
+  def headOption: OptionSource[A]
 
-  def last: Singleton[A]
+  def last: SingletonSource[A]
 
-  def lastOption: Optional[A]
+  def lastOption: OptionSource[A]
 
   def map[B](op: A => B): Source[B]
 
@@ -70,11 +70,11 @@ trait Source[+A]:
 
   def mergeDelayError[B >: A](prefetch: Int, that: Source[B]): Source[B]
 
-  @inline final def mkString: Singleton[String] = mkString("")
+  @inline final def mkString: SingletonSource[String] = mkString("")
 
-  @inline final def mkString(sep: String): Singleton[String] = mkString("", sep, "")
+  @inline final def mkString(sep: String): SingletonSource[String] = mkString("", sep, "")
 
-  def mkString(start: String, sep: String, end: String): Singleton[String]
+  def mkString(start: String, sep: String, end: String): SingletonSource[String]
 
   def onBackpressureBuffer(capacity: Int, overflowStrategy: BufferOverflowStrategy): Source[A]
 
@@ -86,7 +86,7 @@ trait Source[+A]:
 
   def publishOn(ec: ExecutionContext): Source[A]
 
-  def reduce[B >: A](op: (B, A) => B): Optional[B]
+  def reduce[B >: A](op: (B, A) => B): OptionSource[B]
 
   def scan[B](start: B)(op: (B, A) => B): Source[B]
 
@@ -108,7 +108,7 @@ trait Source[+A]:
 
   def toPublisher[B >: A]: Flow.Publisher[B]
 
-  def toSeq: Singleton[Seq[A]]
+  def toSeq: SingletonSource[Seq[A]]
 
 end Source
 

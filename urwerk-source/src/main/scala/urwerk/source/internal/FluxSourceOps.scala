@@ -17,8 +17,8 @@ import scala.jdk.FunctionConverters.*
 import scala.jdk.CollectionConverters.*
 
 import urwerk.source.reactor.FluxConverters.*
-import urwerk.source.Optional
-import urwerk.source.Singleton
+import urwerk.source.OptionSource
+import urwerk.source.SingletonSource
 import urwerk.source.Source
 import urwerk.source.Signal
 import urwerk.source.internal.given
@@ -91,28 +91,28 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
       concurrency,
       prefetch))
 
-  def foldLeft[B](start: B)(op: (B, A) => B): urwerk.source.Singleton[B] =
+  def foldLeft[B](start: B)(op: (B, A) => B): urwerk.source.SingletonSource[B] =
     FluxSingleton.wrap(
       flux.reduce(start,
         op(_, _)).flux)
 
-  def head: urwerk.source.Singleton[A] =
+  def head: urwerk.source.SingletonSource[A] =
     FluxSingleton.wrap(
       flux
         .next()
         .single().flux())
 
-  def headOption: Optional[A] =
+  def headOption: OptionSource[A] =
     FluxOptional.wrap(
       flux
         .next().flux())
 
-  def last: Singleton[A] =
+  def last: SingletonSource[A] =
     FluxSingleton.wrap(
       flux
         .last().flux())
 
-  def lastOption: Optional[A] =
+  def lastOption: OptionSource[A] =
     FluxOptional.wrap(
       flux
         .last()
@@ -142,7 +142,7 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
     FluxSource.wrap(
       Flux.mergeDelayError(prefetch, flux, unwrap(that)))
 
-  def mkString(start: String, sep: String, end: String): Singleton[String] =
+  def mkString(start: String, sep: String, end: String): SingletonSource[String] =
     foldLeft(StringBuilder(start))((builder, elem) =>
         builder.append(elem.toString)
           .append(sep))
@@ -176,7 +176,7 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
     wrap(
       flux.publishOn(Schedulers.fromExecutor(ec.toExecutor)))
 
-  def reduce[A1 >: A](op: (A1, A) => A1): Optional[A1] =
+  def reduce[A1 >: A](op: (A1, A) => A1): OptionSource[A1] =
     def reduceOp[B1 <: A]: BiFunction[B1, B1, B1] = (v1, v2) =>
       op(v1, v2).asInstanceOf[B1]
 
@@ -229,7 +229,7 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
   def toPublisher[A1 >: A]: Flow.Publisher[A1] =
     JdkFlowAdapter.publisherToFlowPublisher(flux.asInstanceOf[Flux[A1]])
 
-  def toSeq: Singleton[Seq[A]] =
+  def toSeq: SingletonSource[Seq[A]] =
     FluxSingleton.wrap(flux
       .collectList
       .flux.map(_.asScala.toSeq))

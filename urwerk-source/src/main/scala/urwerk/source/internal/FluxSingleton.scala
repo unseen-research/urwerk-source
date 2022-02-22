@@ -12,56 +12,56 @@ import scala.util.Success
 import scala.util.Failure
 
 import urwerk.source.Source
-import urwerk.source.Optional
+import urwerk.source.OptionSource
 import urwerk.source.reactor.FluxConverters.*
-import urwerk.source.Singleton
+import urwerk.source.SingletonSource
 import urwerk.source.SingletonFactory
 import urwerk.source.SourceException
 import scala.collection.View.Single
 
 private[source] object FluxSingleton extends SingletonFactory:
 
-  def apply[A](elem: A): Singleton[A] =
+  def apply[A](elem: A): SingletonSource[A] =
     wrap(Flux.just(elem))
 
-  def defer[A](op: => Singleton[A]): Singleton[A] =
+  def defer[A](op: => SingletonSource[A]): SingletonSource[A] =
     wrap(Flux.defer(() =>
       op.toFlux))
 
-  def error[A](error: Throwable): Singleton[A] =
+  def error[A](error: Throwable): SingletonSource[A] =
     wrap(Flux.error(error))
 
-  def from[A](future: CompletableFuture[A]): Singleton[A] =
+  def from[A](future: CompletableFuture[A]): SingletonSource[A] =
     wrap(
       Mono.fromFuture(future)
         .flux())
 
-  def from[A](future: Future[A]): Singleton[A] =
+  def from[A](future: Future[A]): SingletonSource[A] =
     from(
       future.asJava.toCompletableFuture)
 
-  def from[A](elemTry: Try[A]): Singleton[A] = elemTry match
+  def from[A](elemTry: Try[A]): SingletonSource[A] = elemTry match
     case Success(elem) =>
-      Singleton(elem)
+      SingletonSource(elem)
     case Failure(e) =>
-      Singleton.error(e)
+      SingletonSource.error(e)
 
-  private[internal] def wrap[A](flux: Flux[A]): Singleton[A] =
+  private[internal] def wrap[A](flux: Flux[A]): SingletonSource[A] =
     val fluxSingleton = new FluxSingleton(flux)
-    new Singleton[A]{
+    new SingletonSource[A]{
       export fluxSingleton.*
     }
 
-private class FluxSingleton[+A](flux: Flux[? <: A]) extends FluxSourceOps[A](flux), Singleton[A]:
-  type S[A] = Singleton[A]
+private class FluxSingleton[+A](flux: Flux[? <: A]) extends FluxSourceOps[A](flux), SingletonSource[A]:
+  type S[A] = SingletonSource[A]
 
-  protected def wrap[B](flux: Flux[? <: B]): Singleton[B] = FluxSingleton.wrap(flux)
+  protected def wrap[B](flux: Flux[? <: B]): SingletonSource[B] = FluxSingleton.wrap(flux)
 
   def block: A =
     stripReactiveException(flux.blockFirst())
 
-  def filter(pred: A => Boolean): Optional[A] =
+  def filter(pred: A => Boolean): OptionSource[A] =
     FluxOptional.wrap(flux.filter(pred(_)))
 
-  def filterNot(pred: A => Boolean): Optional[A] =
+  def filterNot(pred: A => Boolean): OptionSource[A] =
     filter(!pred(_))
