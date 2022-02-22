@@ -1,6 +1,6 @@
 ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
 
-sonatypeProfileName := "io.github.unseen-research"
+sonatypeProfileName := "io.github.unseen-research.urwerk"
 
 publishMavenStyle := true
 

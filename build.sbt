@@ -1,4 +1,4 @@
-ThisBuild / organization := "io.github.unseen-research"
+ThisBuild / organization := "io.github.unseen-research.urwerk"
 ThisBuild / version      := "0.1.2-SNAPSHOT"
 
 val DottyVersion = "3.1.1"
