@@ -39,7 +39,9 @@ lazy val main = project
     libraryDependencies ++= commonDependencies ++ Seq(
       "io.projectreactor" % "reactor-core" % ReactorVersion % "compile",
       "io.projectreactor" % "reactor-test" % ReactorVersion % "test"
-    )
+    ),
+
+    publishTo := sonatypePublishToBundle.value
   )
 
 lazy val test = (project in file("test"))

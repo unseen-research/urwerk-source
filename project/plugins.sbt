@@ -1,2 +1,2 @@
-//addSbtPlugin("com.codecommit" % "sbt-github-packages" % "0.5.3")
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "1.2.0")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.12")
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.0.1")
