@@ -1,4 +1,4 @@
-ThisBuild / organization := "ur.urwerk"
+ThisBuild / organization := "io.github.unseen-research"
 ThisBuild / version      := "0.1.2"
 
 val DottyVersion = "3.1.1"
@@ -19,16 +19,21 @@ lazy val commonScalacOptions = Seq(
 
 lazy val root = project
   .in(file("."))
-  .aggregate(main, test)
+  .aggregate(urwerkSource, urwerkSourceTest)
   .settings(
     name := "urwerk-source-root",
     description := "Urwerk - reactive library",
 
     scalaVersion := DottyVersion,
-    scalacOptions ++= commonScalacOptions
+    scalacOptions ++= commonScalacOptions,
+    publish := {},
+    publishLocal := {},
+    publishArtifact := false,
+    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo"))) // http://stackoverflow.com/a/18522706
+
   )
 
-lazy val main = project
+lazy val urwerkSource = project
   .in(file("urwerk-source"))
   .settings(
     name := "urwerk-source",
@@ -44,7 +49,7 @@ lazy val main = project
     publishTo := sonatypePublishToBundle.value
   )
 
-lazy val test = (project in file("test"))
+lazy val urwerkSourceTest = (project in file("test"))
   .in(file("urwerk-source-test"))
   .settings(
     name := "urwerk-source-test",
@@ -54,9 +59,10 @@ lazy val test = (project in file("test"))
 
     libraryDependencies ++= commonDependencies ++ Seq(
       "io.projectreactor" % "reactor-test" % ReactorVersion % "compile"
-    )
+    ),
+    publishTo := sonatypePublishToBundle.value
   )
   .dependsOn(
-    main
+    urwerkSource
   )
 
