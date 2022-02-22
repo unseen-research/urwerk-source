@@ -1,33 +1,32 @@
 package urwerk.source
 
-import urwerk.source.TestOps.*
+import urwerk.source.test.*
 import urwerk.test.TestBase
 import java.io.IOException
 
 class OptionalTest extends TestBase:
 
   "apply one element" in {
-    optionalProbe(
-        Optional(7))
+    Optional(7).toVerifier
       .expectNext(7)
       .verifyComplete()
   }
 
   "apply no element" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional())
       .verifyComplete()
   }
 
   "apply some element" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional(Some(7)))
       .expectNext(7)
       .verifyComplete()
   }
 
   "apply none element" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional(None))
       .verifyComplete()
   }
@@ -48,20 +47,20 @@ class OptionalTest extends TestBase:
   }
 
   "empty" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional.empty[Int])
       .verifyComplete()
   }
 
   "error" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional.error(IllegalArgumentException()))
       .expectError(classOf[IllegalArgumentException])
       .verify()
   }
 
   "filter true" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional(42)
          .filter(_ == 42))
       .expectNext(42)
@@ -69,21 +68,21 @@ class OptionalTest extends TestBase:
   }
 
   "filter false" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional(42)
           .filter(_ != 42))
       .verifyComplete()
   }
 
   "filter not true" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional(42)
           .filterNot(_ == 42))
       .verifyComplete()
   }
 
   "filter not false" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional(42)
           .filterNot(_ != 42))
       .expectNext(42)
@@ -91,7 +90,7 @@ class OptionalTest extends TestBase:
   }
 
   "flatMap with optional" in {
-    optionalProbe(
+    OptionalVerifier(
         Optional(42)
           .flatMap(item => Optional(item + 1)))
       .expectNext(43)
@@ -99,7 +98,7 @@ class OptionalTest extends TestBase:
   }
 
   "flatMap with source" in {
-    sourceProbe(
+    SourceVerifier(
         Optional(1)
           .flatMap(item => Source(s"a:$item", s"b:$item")))
       .expectNext("a:1", "b:1")
@@ -107,7 +106,7 @@ class OptionalTest extends TestBase:
   }
 
   "map" in {
-    optionalProbe(
+    OptionalVerifier(
       Optional(1)
         .map(_.toString))
       .expectNext("1")

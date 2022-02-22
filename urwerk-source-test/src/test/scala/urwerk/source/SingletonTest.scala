@@ -1,6 +1,6 @@
 package urwerk.source
 
-import urwerk.source.TestOps.*
+import urwerk.source.test.*
 import urwerk.test.TestBase
 
 import java.util.concurrent.CompletableFuture
@@ -11,7 +11,7 @@ import java.io.IOException
 class SingletonTest extends TestBase:
 
   "apply one element" in {
-    singletonProbe(
+    SingletonVerifier(
         Singleton(7))
       .expectNext(7)
       .verifyComplete()
@@ -37,28 +37,28 @@ class SingletonTest extends TestBase:
     val source = Singleton.defer(
       sources.next)
 
-    singletonProbe(source)
+    SingletonVerifier(source)
       .expectNext(7)
       .verifyComplete()
 
-    singletonProbe(source)
+    SingletonVerifier(source)
       .expectError(classOf[IllegalArgumentException])
       .verify()
 
-    singletonProbe(source)
+    SingletonVerifier(source)
       .expectNext(4)
       .verifyComplete()
   }
 
   "error" in {
-    singletonProbe(
+    SingletonVerifier(
         Singleton.error(IllegalArgumentException()))
       .expectError(classOf[IllegalArgumentException])
       .verify()
   }
 
   "filter true" in {
-    optionalProbe(
+    OptionalVerifier(
         Singleton(42)
           .filter(_ == 42))
       .expectNext(42)
@@ -66,21 +66,21 @@ class SingletonTest extends TestBase:
   }
 
   "filter false" in {
-    optionalProbe(
+    OptionalVerifier(
         Singleton(42)
           .filter(_ != 42))
       .verifyComplete()
   }
 
   "filter not true" in {
-    optionalProbe(
+    OptionalVerifier(
         Singleton(42)
           .filterNot(_ == 42))
       .verifyComplete()
   }
 
   "filter not false" in {
-    optionalProbe(
+    OptionalVerifier(
         Singleton(42)
           .filterNot(_ != 42))
       .expectNext(42)
@@ -88,7 +88,7 @@ class SingletonTest extends TestBase:
   }
 
   "flatMap with singleton" in {
-    singletonProbe(
+    SingletonVerifier(
         Singleton(42)
           .flatMap(item => Singleton(item + 1)))
       .expectNext(43)
@@ -96,7 +96,7 @@ class SingletonTest extends TestBase:
   }
 
   "flatMap with source" in {
-    sourceProbe(
+    SourceVerifier(
         Singleton(1)
           .flatMap(item => Source(s"a:$item", s"b:$item")))
       .expectNext("a:1", "b:1")
@@ -118,7 +118,7 @@ class SingletonTest extends TestBase:
   }
 
   "from failed future" in {
-    singletonProbe(
+    SingletonVerifier(
         Singleton.from(
           Future.failed(IllegalArgumentException())))
       .expectError(classOf[IllegalArgumentException])
@@ -133,14 +133,14 @@ class SingletonTest extends TestBase:
   }
 
   "from failed try" in {
-    singletonProbe(
+    SingletonVerifier(
         Singleton.from(
           Try(throw IllegalArgumentException())))
       .expectError(classOf[IllegalArgumentException])
       .verify()
   }
   "map" in {
-    singletonProbe(
+    SingletonVerifier(
         Singleton(1)
           .map(_.toString))
       .expectNext("1")

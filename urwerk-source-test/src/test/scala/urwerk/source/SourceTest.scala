@@ -16,7 +16,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Success}
 import scala.util.Random
 
-import urwerk.source.TestOps.*
+import urwerk.source.test.*
 import urwerk.test.TestBase
 import urwerk.source.Signal.{Next, Complete, Error}
 import urwerk.source.reactor.FluxConverters.*
