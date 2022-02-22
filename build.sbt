@@ -29,8 +29,7 @@ lazy val root = project
     publish := {},
     publishLocal := {},
     publishArtifact := false,
-    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo"))) // http://stackoverflow.com/a/18522706
-
+    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
   )
 
 lazy val urwerkSource = project
