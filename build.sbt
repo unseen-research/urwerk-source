@@ -25,17 +25,29 @@ publishMavenStyle := true
 
 lazy val root = project
   .in(file("."))
-  .aggregate(urwerkSource, urwerkSourceTest)
+  .aggregate(urwerkCmd, urwerkSource, urwerkSourceTest)
   .settings(
     name := "urwerk-source-root",
     description := "Urwerk - reactive library",
 
     scalaVersion := DottyVersion,
     scalacOptions ++= commonScalacOptions,
-    publish := {},
-    publishLocal := {},
-    publishArtifact := false,
-    publishTo := Some(Resolver.file("Unused transient repository", file("target/unusedrepo")))
+
+    publish / skip := true,
+    publishLocal / skip := true,
+  )
+
+lazy val urwerkCmd = project
+  .in(file("urwerk-cmd"))
+  .settings(
+    name := "urwerk-cmd",
+
+    scalaVersion := DottyVersion,
+    scalacOptions ++= commonScalacOptions,
+
+    libraryDependencies ++= commonDependencies,
+    
+    publishTo :=  Some("nexus" at publishRepositoryUrl)
   )
 
 lazy val urwerkSource = project
@@ -50,7 +62,7 @@ lazy val urwerkSource = project
       "io.projectreactor" % "reactor-core" % ReactorVersion % "compile",
       "io.projectreactor" % "reactor-test" % ReactorVersion % "test"
     ),
-
+    
     publishTo :=  Some("nexus" at publishRepositoryUrl)
   )
 
