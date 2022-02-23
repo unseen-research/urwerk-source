@@ -19,7 +19,11 @@ lazy val commonScalacOptions = Seq(
   "-feature"
 )
 
-//"https://s01.oss.sonatype.org/content/repositories/releases/"
+// val publishRepositoryUrl = if(version.endsWith("SNAPSHOT")) 
+//     "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+//   else
+//     "https://s01.oss.sonatype.org/content/repositories/releases/"
+
 val publishRepositoryUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 publishMavenStyle := true
 
