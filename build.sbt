@@ -1,6 +1,8 @@
 ThisBuild / organization := "io.github.unseen-research.urwerk"
 ThisBuild / version      := "0.1.2-SNAPSHOT"
 
+licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
+
 val DottyVersion = "3.1.1"
 val ReactorVersion = "3.4.15"
 
@@ -16,6 +18,10 @@ lazy val commonScalacOptions = Seq(
   "-encoding", "UTF-8",
   "-feature"
 )
+
+//"https://s01.oss.sonatype.org/content/repositories/releases/"
+val publishRepositoryUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+publishMavenStyle := true
 
 lazy val root = project
   .in(file("."))
@@ -45,7 +51,7 @@ lazy val urwerkSource = project
       "io.projectreactor" % "reactor-test" % ReactorVersion % "test"
     ),
 
-    publishTo :=  Some("nexus" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    publishTo :=  Some("nexus" at publishRepositoryUrl)
   )
 
 lazy val urwerkSourceTest = (project in file("test"))
@@ -59,7 +65,7 @@ lazy val urwerkSourceTest = (project in file("test"))
     libraryDependencies ++= commonDependencies ++ Seq(
       "io.projectreactor" % "reactor-test" % ReactorVersion % "compile"
     ),
-    publishTo :=  Some("nexus" at "https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    publishTo :=  Some("nexus" at publishRepositoryUrl)
   )
   .dependsOn(
     urwerkSource
