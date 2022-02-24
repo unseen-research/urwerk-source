@@ -209,7 +209,7 @@ class DeclineTest extends TestBase:
   
   // case class IntValue(get: Int) extends Value[Int]
 
-  class Binding[A](name: String, value: A)
+  case class Binding[A](name: String, value: A)
 
   class BindingKey(name: String):
     def / (name: String): BindingKey = BindingKey(name)
@@ -226,59 +226,42 @@ class DeclineTest extends TestBase:
       ???
 
   object BindingProbe: 
-    //inline def apply[A](using m: Mirror.Of[A]) =  //: BindingProbe[A] = 
-    inline def apply[A](using m: Mirror.Of[A]) =  //: BindingProbe[A] = 
+    inline def apply[A](using m: Mirror.ProductOf[A]) : BindingProbe[A] = 
       val name = constValue[m.MirroredLabel]
-      val values = constValueTuple[m.MirroredElemLabels].productIterator.mkString(", ")
-      s"ClassName=$name: props=$values"
-      //.productIterator.map(_.toString).toSeq
-      // type ValueOfs = Tuple.Map[mirror.MirroredElemLabels, ValueOf]
-      // type VV = mirror.MirroredElemLabels
+      val names = constValueTuple[m.MirroredElemLabels].productIterator.map(_.toString)
+      println(s"ClassName=$name: props=$names")
+     
+      def valueTuple(properties: Map[String, Any]): Tuple = 
+        val values = names.map{name=> properties(name)}.toArray
+        Tuple.fromArray(values)
 
-      // //summonAll[VV]
-
-      // val valueOfs = summonAll[ValueOfs]
-
-      // def values(t: Tuple): Tuple = t match
-      //   case (h: ValueOf[_]) *: t1 => h.value *: values(t1)
-      //   case EmptyTuple => EmptyTuple
-
-      // val x = values(valueOfs) // (i,s)
-
-      // println(s"XXXLables $x")
+      def fromTuple(tuple: Tuple): A = 
+        m.fromProduct(tuple)
       
-      //???
+      new BindingProbe(Seq(), valueTuple, fromTuple)
 
-  class BindingProbe[A]:
-    def apply(bindings: Binding[?]*): BindingProbe[A] = ???
+  class BindingProbe[A](bindings: Seq[Binding[?]], propertiesOp: Map[String, Any] => Tuple, fromTupleOp: Tuple=> A):
+    def apply(bindings: Binding[?]*): BindingProbe[A] = 
+      new BindingProbe(bindings, propertiesOp, fromTupleOp)
     
-    def toConfig: A = ???
+    def toConfig: A = 
+      val propMap = bindings.foldLeft(Map[String, Any]()){case (properties, Binding(name, value)) =>
+        properties.updated(name, value)
+      }
+      val values = propertiesOp(propMap)
+
+      fromTupleOp(values)
+
+      
 
 
-
-  enum Color:
-    case Red, Green, Blue
-
-  inline def enumDescription[E](using m: Mirror.Of[E]): String =
-    val name = constValue[m.MirroredLabel]
-    val values = constValueTuple[m.MirroredElemLabels].productIterator.mkString(", ")
-    s"$name: $values"
-
-    
 
   "bind test" in {
-    
-    println(enumDescription[Color])
-    
     case class Config(abc: String, xyz: Int)  
-    val bp = BindingProbe[Config]
+    val bp = BindingProbe[Config].apply(
+      bind / "abc" := "value", 
+      bind / "xyz" := 77)
 
-
-    println(s"DESCR $bp")
-    // // .apply(
-    // //   bind / "abc" := "value", 
-    // //   bind / "xyz" := 77)
-
-    // bp.toConfig should be (Config("value", 77))
+    bp.toConfig should be (Config("value", 77))
   }
 
