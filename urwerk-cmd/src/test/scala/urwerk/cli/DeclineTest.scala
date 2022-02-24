@@ -4,8 +4,11 @@ import urwerk.test.TestBase
 
 import scala.deriving.Mirror
 import scala.compiletime.summonAll
+import scala.compiletime.erasedValue
 import scala.compiletime.summonInline
+import scala.compiletime.summonFrom
 import scala.compiletime.{constValue, constValueTuple}
+import scala.collection.mutable.ArrayBuffer
 
 
 class DeclineTest extends TestBase:
@@ -209,6 +212,14 @@ class DeclineTest extends TestBase:
   
   // case class IntValue(get: Int) extends Value[Int]
 
+  trait ValueHandler[A]:
+    def valueTypeLabel: String
+
+  given ValueHandler[String] with
+    def valueTypeLabel: String = "Stringtype"
+  
+  given ValueHandler[Int] with
+    def valueTypeLabel: String = "Inttype"
   case class Binding[A](name: String, value: A)
 
   class BindingKey(name: String):
@@ -218,17 +229,12 @@ class DeclineTest extends TestBase:
 
   val bind = BindingKey("")
 
-  inline def doit[A](using Mirror.Of[A]): BindingProbe[A] = 
-      
-      val mirror = summon[Mirror.Of[A]]
-      
-      val names = constValueTuple[mirror.MirroredElemLabels]  
-      ???
-
   object BindingProbe: 
     inline def apply[A](using m: Mirror.ProductOf[A]) : BindingProbe[A] = 
       val name = constValue[m.MirroredLabel]
       val names = constValueTuple[m.MirroredElemLabels].productIterator.map(_.toString)
+
+      
       println(s"ClassName=$name: props=$names")
      
       def valueTuple(properties: Map[String, Any]): Tuple = 
@@ -252,10 +258,6 @@ class DeclineTest extends TestBase:
 
       fromTupleOp(values)
 
-      
-
-
-
   "bind test" in {
     case class Config(abc: String, xyz: Int)  
     val bp = BindingProbe[Config](
@@ -265,3 +267,38 @@ class DeclineTest extends TestBase:
     bp.toConfig should be (Config("value", 77))
   }
 
+  "test otehr" in {
+    val / = "slash value"
+    println(/) 
+  }
+
+  
+// trait FieldCollector[T] {
+//   def collect(fields: Collector): Collector
+// }
+  
+// object FieldCollector {
+
+//   inline def collectFromChild[T](fields: ArrayBuffer[String]): Collector =
+//     summonFrom {
+//       case fc: FieldCollector[T] => fc.collect(fields)
+//     }
+
+//   inline def collectFromProduct[Fields <: Tuple, Types <: Tuple](fields: ArrayBuffer[String]): ArrayBuffer[String] = {
+//     inline erasedValue[(Fields, Types)] match {
+//       case (_: (field *: fields), _: (tpe *: types)) => 
+//         collectFromProduct[fields, types](fields.add(constValue[field].toString))
+//       case _ =>
+//         fields
+//     }
+//   }
+
+//   inline def derived[T](given ev: Mirror.Of[T], ct: ClassTag[T]): FieldCollector[T] = new FieldCollector[T] {
+//     def collect(fields: ArrayBuffer[String]): ArrayBuffer[String] = {
+//       inline ev match {
+//         case m: Mirror.ProductOf[T] => 
+//           collectFromProduct[m.MirroredElemLabels, m.MirroredElemTypes](fields)
+//       }
+//     }
+//   }
+// }
