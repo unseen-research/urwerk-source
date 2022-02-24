@@ -4,6 +4,8 @@ import urwerk.test.TestBase
 
 import scala.deriving.Mirror
 import scala.compiletime.summonAll
+import scala.compiletime.summonInline
+import scala.compiletime.{constValue, constValueTuple}
 
 
 class DeclineTest extends TestBase:
@@ -199,3 +201,84 @@ class DeclineTest extends TestBase:
 
     val w = Wrapper["String"]("String")
   }
+  
+  // trait Value[A]:
+  //   def get: A
+
+  // case class StringValue(get: String) extends Value[String]
+  
+  // case class IntValue(get: Int) extends Value[Int]
+
+  class Binding[A](name: String, value: A)
+
+  class BindingKey(name: String):
+    def / (name: String): BindingKey = BindingKey(name)
+
+    def := [A] (value: A): Binding[A] = Binding(name, value)
+
+  val bind = BindingKey("")
+
+  inline def doit[A](using Mirror.Of[A]): BindingProbe[A] = 
+      
+      val mirror = summon[Mirror.Of[A]]
+      
+      val names = constValueTuple[mirror.MirroredElemLabels]  
+      ???
+
+  object BindingProbe: 
+    //inline def apply[A](using m: Mirror.Of[A]) =  //: BindingProbe[A] = 
+    inline def apply[A](using m: Mirror.Of[A]) =  //: BindingProbe[A] = 
+      val name = constValue[m.MirroredLabel]
+      val values = constValueTuple[m.MirroredElemLabels].productIterator.mkString(", ")
+      s"ClassName=$name: props=$values"
+      //.productIterator.map(_.toString).toSeq
+      // type ValueOfs = Tuple.Map[mirror.MirroredElemLabels, ValueOf]
+      // type VV = mirror.MirroredElemLabels
+
+      // //summonAll[VV]
+
+      // val valueOfs = summonAll[ValueOfs]
+
+      // def values(t: Tuple): Tuple = t match
+      //   case (h: ValueOf[_]) *: t1 => h.value *: values(t1)
+      //   case EmptyTuple => EmptyTuple
+
+      // val x = values(valueOfs) // (i,s)
+
+      // println(s"XXXLables $x")
+      
+      //???
+
+  class BindingProbe[A]:
+    def apply(bindings: Binding[?]*): BindingProbe[A] = ???
+    
+    def toConfig: A = ???
+
+
+
+  enum Color:
+    case Red, Green, Blue
+
+  inline def enumDescription[E](using m: Mirror.Of[E]): String =
+    val name = constValue[m.MirroredLabel]
+    val values = constValueTuple[m.MirroredElemLabels].productIterator.mkString(", ")
+    s"$name: $values"
+
+    
+
+  "bind test" in {
+    
+    println(enumDescription[Color])
+    
+    case class Config(abc: String, xyz: Int)  
+    val bp = BindingProbe[Config]
+
+
+    println(s"DESCR $bp")
+    // // .apply(
+    // //   bind / "abc" := "value", 
+    // //   bind / "xyz" := 77)
+
+    // bp.toConfig should be (Config("value", 77))
+  }
+
