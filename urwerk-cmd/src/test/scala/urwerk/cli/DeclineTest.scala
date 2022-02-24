@@ -258,7 +258,7 @@ class DeclineTest extends TestBase:
 
   "bind test" in {
     case class Config(abc: String, xyz: Int)  
-    val bp = BindingProbe[Config].apply(
+    val bp = BindingProbe[Config](
       bind / "abc" := "value", 
       bind / "xyz" := 77)
 
