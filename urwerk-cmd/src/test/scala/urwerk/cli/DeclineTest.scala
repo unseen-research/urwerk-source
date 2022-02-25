@@ -273,9 +273,10 @@ class DeclineTest extends TestBase:
     case class Config(abc: String, xyz: Int, seq: Seq[String] = Seq())  
     val bp = BindingProbe[Config](
       bind / "abc" := "value", 
-      bind / "xyz" := 77)
+      bind / "xyz" := 77,
+      bind / "seq" := Seq("a", "b"))
 
-    bp.toConfig should be (Config("value", 77))
+    bp.toConfig should be (Config("value", 77, Seq("a", "b")))
   }
 
   "test otehr" in {
