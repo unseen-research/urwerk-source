@@ -220,6 +220,12 @@ class DeclineTest extends TestBase:
   
   given ValueHandler[Int] with
     def valueTypeLabel: String = "Inttype"
+  
+    //given listOrd[T](using ord: Ord[T]): Ord[List[T]] with
+  given valhand[A](using x: ValueHandler[A]): ValueHandler[Seq[A]] with
+    def valueTypeLabel: String = s"Seq[${x.valueTypeLabel}+++]"
+
+  
   case class Binding[A](name: String, value: A)
 
   class BindingKey(name: String):
@@ -234,7 +240,12 @@ class DeclineTest extends TestBase:
       val name = constValue[m.MirroredLabel]
       val names = constValueTuple[m.MirroredElemLabels].productIterator.map(_.toString)
 
-      
+      type TypeHandler = Tuple.Map[m.MirroredElemTypes, ValueHandler]
+      val elemTransformers = summonAll[TypeHandler].toList.asInstanceOf[List[ValueHandler[?]]]  
+
+      elemTransformers.foreach{vh=>
+        println(s"VALUE HANDler ${vh.valueTypeLabel}")
+      }
       println(s"ClassName=$name: props=$names")
      
       def valueTuple(properties: Map[String, Any]): Tuple = 
@@ -259,7 +270,7 @@ class DeclineTest extends TestBase:
       fromTupleOp(values)
 
   "bind test" in {
-    case class Config(abc: String, xyz: Int)  
+    case class Config(abc: String, xyz: Int, seq: Seq[String] = Seq())  
     val bp = BindingProbe[Config](
       bind / "abc" := "value", 
       bind / "xyz" := 77)
