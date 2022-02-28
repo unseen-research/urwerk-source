@@ -29,7 +29,8 @@ publishMavenStyle := true
 
 lazy val root = project
   .in(file("."))
-  .aggregate(urwerkCmd, urwerkSource, urwerkSourceTest)
+  .aggregate(
+    urwerkCmd, urwerkHttp, urwerkIo, urwerkSource, urwerkSourceTest)
   .settings(
     name := "urwerk-source-root",
     description := "Urwerk - reactive library",
@@ -53,6 +54,42 @@ lazy val urwerkCmd = project
     
     publishTo :=  Some("nexus" at publishRepositoryUrl)
   )
+
+lazy val urwerkIo = project
+  .in(file("urwerk-io"))
+  .settings(
+    name := "urwerk-io",
+
+    scalaVersion := DottyVersion,
+    scalacOptions ++= commonScalacOptions,
+
+    libraryDependencies ++= commonDependencies,
+    
+    publishTo :=  Some("nexus" at publishRepositoryUrl)
+  )
+  .dependsOn(
+    urwerkSource,
+    urwerkSourceTest % "test"
+  )
+
+lazy val urwerkHttp = project
+  .in(file("urwerk-http"))
+  .settings(
+    name := "urwerk-http",
+
+    scalaVersion := DottyVersion,
+    scalacOptions ++= commonScalacOptions,
+
+    libraryDependencies ++= commonDependencies,
+    
+    publishTo :=  Some("nexus" at publishRepositoryUrl)
+  )
+  .dependsOn(
+    urwerkIo,
+    urwerkSource,
+    urwerkSourceTest % "test"
+  )
+
 
 lazy val urwerkSource = project
   .in(file("urwerk-source"))

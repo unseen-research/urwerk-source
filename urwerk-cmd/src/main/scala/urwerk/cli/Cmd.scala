@@ -1,49 +1,40 @@
 package urwerk.cli
 
+import scala.deriving.Mirror
+
+class Param
 
 object Cmd:
-  sealed trait Setting[C]
+  inline def apply[A <: Product](using m: Mirror.ProductOf[A]) : Cmd[A] = 
+    new Cmd()
 
-  case class ValueBinding[C, V](name: String, value: V) extends Setting[C]
+  sealed trait Setting
 
-  case class ValueName[C](name: String):
-    def :=[V] (value: V): ValueBinding[C, V] = ValueBinding(name, value)
-   
-  object Value:
-    def / [C] (name: String): ValueName[C] = ValueName(name)
+  class Bind: 
+    def / (name: String): BindingKey = new BindingKey(name)
 
+  val bind = Bind()
+
+  class BindingKey(name: String):
+    def :=[A] (value: A): Binding[A] = Binding(name, value)
+
+    def := (scope: BindingScope): BindingScope = ???
+
+  class BindingScope(scope: String):
+    def / (param: Param): Binding[?] = ???
+
+  class Binding[A](name: String, value: A) extends Setting
   
-  case class Action[C](action: C => Any) extends Setting[C]:
-    def apply(config: C): Any = action(config)
-  
-  object Action:
-
-    def :=[C] (action: C => Any): Action[C] = Action(action)
-
-  def apply[C <: Product](setting: Setting[C], settings: Setting[C]*): Cmd[C] = 
-    ///val valueOfs = summonAll[ValueOfs]
-    
-
-    new Cmd(setting +: settings)
-
   extension [C <: Product](cmd: Cmd[C])
-    def execute(args: String*): Any = 
-      val action = cmd.action
-      //val mirror = cmd.mirror
-
-    //val types = summon[mirror.MirroredElemTypes =:= (String, Int, Boolean)]
-    
-   // val valueOfs = summonAll[ValueOfs]
+    def execute(args: String*): Int = 
       ???
 
 end Cmd
 
-class Cmd[C <: Product](val settings: Seq[Cmd.Setting[C]]):
+class Cmd[A <: Product]():
   import Cmd.*
 
-  //val mirror = summon[Mirror.Of[C]]
+  def apply(setting: Setting, settings: Setting*): Cmd[A] = 
+    ???
 
-  lazy val action: C => Any = 
-    settings.collect{case Action(action) => action}.last
-
-  lazy val values = settings.collect{case ValueBinding(name, value) => action}
+  
