@@ -5,8 +5,10 @@ import reactor.core.publisher.Flux
 
 import urwerk.io
 import urwerk.io.ByteString
-import urwerk.source.TestOps.{singletonProbe, sourceProbe}
-import urwerk.source.{Singleton, Source, TestOps}
+import urwerk.io.file.FileOps
+//import urwerk.source.TestOps.{singletonProbe, sourceProbe}
+import urwerk.source.{SingletonSource, Source}
+import urwerk.source.test.SourceVerifier
 import urwerk.test.{TestBase, uniqueDirectory, uniqueFile, uniquePath}
 
 import java.net.URI
@@ -18,7 +20,7 @@ import java.nio.file.NoSuchFileException
 
 import scala.concurrent.ExecutionContext
 import scala.util.Random
-import java.util.concurrent.Executors
+
 
 given ExecutionContext = ExecutionContext.global
 
@@ -44,14 +46,14 @@ class FileTest extends TestBase:
     val givenBytes = Random.nextBytes(100)
     val givenBuffers = givenBytes.map(byte => ByteString(byte))
     val file = uniqueFile(givenBytes)
-    given ExecutionContext = ExecutionContext.global
+    //given ExecutionContext = ExecutionContext.global
 
     val actualBuffers = file.byteSource(1).toSeq.block
     actualBuffers should be (givenBuffers)
   }
 
   "create byte source fails with no such file" in {
-    sourceProbe(
+    SourceVerifier(
         uniquePath.byteSource())
       .expectError(classOf[NoSuchFileException])
       .verify()

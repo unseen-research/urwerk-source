@@ -12,8 +12,6 @@ import java.nio.file.{Files, StandardOpenOption}
 import scala.concurrent.ExecutionContext
 import scala.jdk.CollectionConverters.given
 
-//import urwerk.concurrent.given
-
 trait FileOps {
   extension (file: Path)(using ec: ExecutionContext)
     def byteSource(): Source[ByteString] =
