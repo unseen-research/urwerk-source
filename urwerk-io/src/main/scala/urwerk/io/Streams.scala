@@ -15,8 +15,10 @@ object Streams:
   val DefaultBufferSize: Int = 4096 * 2
 
   extension [A <: OutputStream](outputStream: A)
-    def write(bytes: ByteString): A =
-      outputStream.write(bytes.array, bytes.offset, bytes.length)
+    def write(bytes: Seq[Byte]): A =
+      for(i <- 0 until bytes.size) 
+        outputStream.write(bytes(i))
+      
       outputStream
 
   extension (inputStream: InputStream)
