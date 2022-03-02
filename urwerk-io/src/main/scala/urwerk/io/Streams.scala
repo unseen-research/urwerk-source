@@ -22,14 +22,14 @@ object Streams:
       outputStream
 
   extension (inputStream: InputStream)
-    def toSource: Source[ByteString] =
+    def toSource: Source[Seq[Byte]] =
       toSource(Streams.DefaultBufferSize)
 
-    def toSource(blockSize: Int): Source[ByteString] = readBytes(inputStream, blockSize)
+    def toSource(blockSize: Int): Source[Seq[Byte]] = readBytes(inputStream, blockSize)
 
-private def readBytes(inputStream: InputStream, blockSize: Int): Source[ByteString] =
+private def readBytes(inputStream: InputStream, blockSize: Int): Source[Seq[Byte]] =
   Source.using(Channels.newChannel(inputStream), _.close){channel =>
-    Source.create[ByteString]{sink =>
+    Source.create[Seq[Byte]]{sink =>
       val buffer: ByteBuffer = ByteBuffer.allocate(blockSize)
       readBytes(channel, buffer, sink, blockSize)
     }
@@ -39,7 +39,7 @@ private def readBytes(inputStream: InputStream, blockSize: Int): Source[ByteStri
 private def readBytes(
     channel: ReadableByteChannel,
     buffer: ByteBuffer,
-    sink: Sink[ByteString],
+    sink: Sink[Seq[Byte]],
     blockSize: Int): Unit =
   val size = channel.read(buffer)
 

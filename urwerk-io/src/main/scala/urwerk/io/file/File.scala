@@ -14,10 +14,10 @@ import scala.jdk.CollectionConverters.given
 
 trait FileOps {
   extension (file: Path)(using ec: ExecutionContext)
-    def byteSource(): Source[ByteString] =
+    def byteSource(): Source[Seq[Byte]] =
       read(file)
 
-    def byteSource(blockSize: Int): Source[ByteString] =
+    def byteSource(blockSize: Int): Source[Seq[Byte]] =
       read(file, blockSize)
 }
 
@@ -50,10 +50,10 @@ extension (executionContext: ExecutionContext)
 
 
 
-private def read(path: Path)(using ec: ExecutionContext): Source[ByteString] =
+private def read(path: Path)(using ec: ExecutionContext): Source[Seq[Byte]] =
   read(path, -1).subscribeOn(ec)
 
-private def read(path: Path, blockSize: Int)(using ec: ExecutionContext): Source[ByteString] =
+private def read(path: Path, blockSize: Int)(using ec: ExecutionContext): Source[Seq[Byte]] =
   def openChannel() =
     AsynchronousFileChannel.open(path, Set(StandardOpenOption.READ).asJava, ec.toExecutorService)
 
@@ -66,7 +66,7 @@ private def read(path: Path, blockSize: Int)(using ec: ExecutionContext): Source
     }
   }
 
-private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink[ByteString], val position: Long, blockSize: Int) extends CompletionHandler[Integer, ByteBuffer]:
+private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], val position: Long, blockSize: Int) extends CompletionHandler[Integer, ByteBuffer]:
   def completed(readCount: Integer, buffer: ByteBuffer): Unit =
     if readCount >= 0 then
       buffer.flip()
@@ -97,7 +97,7 @@ private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink
 
 // trait PathOps:
 //   extension (path: Path)
-//     def bytes(using options: ReadOptions): Source[ByteString] =
+//     def bytes(using options: ReadOptions): Source[Seq[Byte]] =
 //       readBytes(path, options)
 
 //     def attributes[A](using getOp: GetAttributes[A]): Singleton[A] =
@@ -138,8 +138,8 @@ private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink
 //     def files: Source[io.Path] =
 //       list.filter(_.isFile)
 
-//   private def readBytes(path: io.Path, options: ReadOptions): Source[ByteString] =
-//     Source.create[ByteString]{sink =>
+//   private def readBytes(path: io.Path, options: ReadOptions): Source[Seq[Byte]] =
+//     Source.create[Seq[Byte]]{sink =>
 //       val fileChan = FileChannel.open(Path(path), StandardOpenOption.READ)
 //       sink.onRequest(requestCount =>
 //         readBytes(fileChan, requestCount, sink, options))
@@ -151,7 +151,7 @@ private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink
 //   private def readBytes(
 //       channel: ReadableByteChannel,
 //       requestCount: Long,
-//       sink: Sink[ByteString],
+//       sink: Sink[Seq[Byte]],
 //       options: ReadOptions): Unit =
 //     if channel.isOpen && requestCount > 0 then
 //       val buffer: ByteBuffer = ByteBuffer.allocate(options.chunkSize)
@@ -162,7 +162,7 @@ private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink
 //       } else
 //         buffer.flip()
 //         if (buffer.limit() > 0) {
-//           sink.next(ByteString.from(buffer))
+//           sink.next(Seq[Byte].from(buffer))
 //         }
 //         readBytes(channel, requestCount - 1, sink, options)
 //     else
