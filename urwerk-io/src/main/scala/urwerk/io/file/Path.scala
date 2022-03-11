@@ -5,6 +5,8 @@ import java.nio.file.Paths
 import scala.jdk.CollectionConverters.given
 
 import urwerk.io
+import urwerk.source.Source
+import scala.concurrent.ExecutionContext
 
 type Path = java.nio.file.Path
 
@@ -17,14 +19,17 @@ object Path:
 
 val Cwd: Path = Path("").toAbsolutePath
 
-trait PathOps:
-  extension (path: Path)
-    infix def /(element: String): Path =
-      path.resolve(element)
+extension (path: Path)
+  infix def /(element: String): Path =
+    path.resolve(element)
 
-    def toSeq: Seq[String] =
-      val elems = path.iterator.asScala.toSeq.map(_.toString)
-      if path.isAbsolute then "/" +: elems
-      else elems
+  def toSeq: Seq[String] =
+    val elems = path.iterator.asScala.toSeq.map(_.toString)
+    if path.isAbsolute then "/" +: elems
+    else elems
 
-given PathOps = new PathOps{}
+  def toSource(using ec: ExecutionContext): Source[Seq[Byte]] = 
+    read(path)
+
+  def toSource(blockSize: Int)(using ec: ExecutionContext): Source[Seq[Byte]] =
+      read(path, blockSize)

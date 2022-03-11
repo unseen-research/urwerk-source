@@ -5,8 +5,7 @@ import reactor.core.publisher.Flux
 
 import urwerk.io
 import urwerk.io.ByteString
-import urwerk.io.file.FileOps
-//import urwerk.source.TestOps.{singletonProbe, sourceProbe}
+import urwerk.io.Bytes
 import urwerk.source.{SingletonSource, Source}
 import urwerk.source.test.SourceVerifier
 import urwerk.test.{TestBase, uniqueDirectory, uniqueFile, uniquePath}
@@ -20,7 +19,7 @@ import java.nio.file.NoSuchFileException
 
 import scala.concurrent.ExecutionContext
 import scala.util.Random
-
+import scala.collection.compat.immutable.ArraySeq
 
 given ExecutionContext = ExecutionContext.global
 
@@ -29,11 +28,13 @@ class FileTest extends TestBase:
   "create byte source with filesystem block size" in {
     val file = uniqueFile
     val blockSize: Int = Files.getFileStore(file).getBlockSize.toInt
+    
     val givenBytes = Random.nextBytes(blockSize * 3)
     val givenByteStrings = Seq(
-      ByteString.unsafeWrap(givenBytes, 0, blockSize),
-      ByteString.unsafeWrap(givenBytes, blockSize, blockSize),
-      ByteString.unsafeWrap(givenBytes, blockSize * 2, blockSize))
+      Bytes.unsafeWrap(givenBytes, 0, blockSize),
+      Bytes.unsafeWrap(givenBytes, blockSize, blockSize),
+      Bytes.unsafeWrap(givenBytes, blockSize * 2, blockSize))
+    
     Files.write(file, givenBytes)
 
     val actualBytes = file.byteSource()
@@ -43,10 +44,9 @@ class FileTest extends TestBase:
   }
 
   "create byte source with custom block size" in {
-    val givenBytes = Random.nextBytes(100)
-    val givenBuffers = givenBytes.map(byte => ByteString(byte))
+    val givenBytes = Random.nextBytes(2)
+    val givenBuffers = givenBytes.map(byte => ArraySeq.unsafeWrapArray(Array(byte)))
     val file = uniqueFile(givenBytes)
-    //given ExecutionContext = ExecutionContext.global
 
     val actualBuffers = file.byteSource(1).toSeq.block
     actualBuffers should be (givenBuffers)
