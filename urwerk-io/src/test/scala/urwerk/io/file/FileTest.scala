@@ -45,10 +45,13 @@ class FileTest extends TestBase:
 
   "create byte source with custom block size" in {
     val givenBytes = Random.nextBytes(2)
+
     val givenBuffers = givenBytes.map(byte => ArraySeq.unsafeWrapArray(Array(byte)))
     val file = uniqueFile(givenBytes)
 
-    val actualBuffers = file.byteSource(1).toSeq.block
+    val actualBuffers = file.byteSource(1)
+    .doOnNext(block => println(s"BLOCK ${block(0)}"))
+    .toSeq.block
     actualBuffers should be (givenBuffers)
   }
 

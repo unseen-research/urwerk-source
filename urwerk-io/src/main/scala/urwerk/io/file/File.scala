@@ -13,6 +13,7 @@ import scala.concurrent.ExecutionContextExecutorService
 import scala.jdk.CollectionConverters.given
 
 import urwerk.io.Bytes
+import urwerk.io.ByteString
 import urwerk.source.Sink
 import urwerk.source.Source
 
@@ -62,7 +63,7 @@ private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink
     if readCount >= 0 then
       buffer.flip()
       if buffer.limit() > 0 then
-        sink.next(Bytes.unsafeWrap(buffer))
+        sink.next(ByteString.from(buffer))///
       val nextPos = position + readCount
       channel.read(buffer, nextPos, buffer.clear(),
         ReadCompletionHandler(channel, sink, nextPos, blockSize))
