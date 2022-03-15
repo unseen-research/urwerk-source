@@ -11,5 +11,8 @@ object ByteSeq:
   def unsafeWrap(array: Array[Byte], offset: Int, length: Int): Seq[Byte] = 
     ByteString.unsafeWrap(array, offset, length)
     
-  def unsafeWrap(buffer: ByteBuffer): Seq[Byte] = 
-    ByteString.unsafeWrap(buffer)
+  def attemptUnsafeWrap(buffer: ByteBuffer): Seq[Byte] | ByteBuffer = 
+    if buffer.hasArray && buffer.capacity == buffer.remaining then
+      ArraySeq.unsafeWrapArray(buffer.array)
+    else
+      buffer

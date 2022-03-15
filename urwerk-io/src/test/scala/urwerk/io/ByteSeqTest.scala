@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 import urwerk.test.TestBase
 
-class BytesTest extends TestBase:
+class ByteSeqTest extends TestBase:
   "wrap entire array" in {
     ByteSeq.unsafeWrap(bytes(1, 2, 3)) should be(Seq(1, 2, 3))
   }
@@ -15,6 +15,35 @@ class BytesTest extends TestBase:
 
     a.update(1, 0)
     bs should be(ByteString(1, 0, 3))
+  }
+
+  "attempt unsafe wrap succeeds" in {
+    val buffer = ByteBuffer.wrap(bytes(1, 2, 3))
+    ByteSeq.attemptUnsafeWrap(buffer) match
+      case seq: Seq[_] =>
+        seq should be(bytes(1, 2, 3))
+      case _ => ???
+  }
+
+  "xxx" in {
+    val b1 = ByteBuffer.wrap(bytes(1, 2, 3, 4, 5), 2, 2)
+  
+    println(s"SIZES ${b1.arrayOffset()} ${b1.array.size}  $b1 ${b1.clear}")
+
+    val buffer = ByteBuffer.allocate(5)
+
+    println(s"SIZE ${buffer.array.size}")
+    buffer.put(bytes(1, 2, 3, 4, 5))
+
+    println(s"BUFFER $buffer  ${buffer.remaining}")
+
+    buffer.flip()
+
+    println(s"BUFFER $buffer  ${buffer.remaining}")
+
+    buffer.flip()
+
+    println(s"BUFFER $buffer")
   }
 
   // "wrap partial array" in {
