@@ -5,7 +5,7 @@ import reactor.core.publisher.Flux
 
 import urwerk.io
 import urwerk.io.ByteString
-import urwerk.io.Bytes
+import urwerk.io.ByteSeq
 import urwerk.source.{SingletonSource, Source}
 import urwerk.source.test.SourceVerifier
 import urwerk.test.{TestBase, uniqueDirectory, uniqueFile, uniquePath}
@@ -31,9 +31,9 @@ class FileTest extends TestBase:
     
     val givenBytes = Random.nextBytes(blockSize * 3)
     val givenByteStrings = Seq(
-      Bytes.unsafeWrap(givenBytes, 0, blockSize),
-      Bytes.unsafeWrap(givenBytes, blockSize, blockSize),
-      Bytes.unsafeWrap(givenBytes, blockSize * 2, blockSize))
+      ByteSeq.unsafeWrap(givenBytes, 0, blockSize),
+      ByteSeq.unsafeWrap(givenBytes, blockSize, blockSize),
+      ByteSeq.unsafeWrap(givenBytes, blockSize * 2, blockSize))
     
     Files.write(file, givenBytes)
 

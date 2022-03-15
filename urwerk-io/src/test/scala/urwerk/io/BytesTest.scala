@@ -6,12 +6,12 @@ import urwerk.test.TestBase
 
 class BytesTest extends TestBase:
   "wrap entire array" in {
-    Bytes.unsafeWrap(bytes(1, 2, 3)) should be(Seq(1, 2, 3))
+    ByteSeq.unsafeWrap(bytes(1, 2, 3)) should be(Seq(1, 2, 3))
   }
 
   "array is wrapped" in {
     val a = bytes(1, 2, 3)
-    val bs = Bytes.unsafeWrap(a) 
+    val bs = ByteSeq.unsafeWrap(a) 
 
     a.update(1, 0)
     bs should be(ByteString(1, 0, 3))

@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.ExecutionContextExecutorService
 import scala.jdk.CollectionConverters.given
 
-import urwerk.io.Bytes
+import urwerk.io.ByteSeq
 import urwerk.io.ByteString
 import urwerk.source.Sink
 import urwerk.source.Source

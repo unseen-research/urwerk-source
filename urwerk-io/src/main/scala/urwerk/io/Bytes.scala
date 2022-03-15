@@ -3,7 +3,7 @@ package urwerk.io
 import java.nio.ByteBuffer
 import scala.collection.immutable.ArraySeq
 
-object Bytes:
+object ByteSeq:
 
   def unsafeWrap(array: Array[Byte]): Seq[Byte] = 
     ArraySeq.unsafeWrapArray(array)  
