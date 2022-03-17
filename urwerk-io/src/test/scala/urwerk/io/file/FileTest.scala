@@ -28,7 +28,7 @@ class FileTest extends TestBase:
       Files.write(file, block, StandardOpenOption.APPEND)
     }
 
-    val actualBlocks = file.byteSource()
+    val actualBlocks = file.bytes
       .toSeq.block
 
     actualBlocks should be(givenBlocks.map(_.toSeq))
@@ -40,14 +40,14 @@ class FileTest extends TestBase:
     val givenBuffers = givenBytes.map(byte => ArraySeq.unsafeWrapArray(Array(byte)))
     val file = uniqueFile(givenBytes)
 
-    val actualBuffers = file.byteSource(1)
+    val actualBuffers = file.bytes(1)
     .toSeq.block
     actualBuffers should be (givenBuffers)
   }
 
   "create byte source fails with no such file" in {
     SourceVerifier(
-        uniquePath.byteSource())
+        uniquePath.bytes)
       .expectError(classOf[NoSuchFileException])
       .verify()
   }

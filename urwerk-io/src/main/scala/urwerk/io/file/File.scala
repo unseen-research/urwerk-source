@@ -18,10 +18,10 @@ import scala.collection.compat.immutable.ArraySeq
 import scala.languageFeature.postfixOps
 
 extension (file: Path)(using ec: ExecutionContext)
-  def byteSource(): Source[Seq[Byte]] =
+  def bytes: Source[Seq[Byte]] =
     read(file)
 
-  def byteSource(blockSize: Int): Source[Seq[Byte]] =
+  def bytes(blockSize: Int): Source[Seq[Byte]] =
     read(file, blockSize)
 
 extension (executionContext: ExecutionContext)
@@ -75,19 +75,3 @@ private def read(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], positi
     def failed(error: Throwable, buffer: ByteBuffer): Unit =
       sink.error(error)
   )
-
-// private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], val position: Long, blockSize: Int) extends CompletionHandler[Integer, ByteBuffer]:
-  
-//   def completed(readCount: Integer, buffer: ByteBuffer): Unit =
-//     if readCount >= 0 then
-//       buffer.flip()
-//       if buffer.limit() > 0 then
-//         sink.next(ByteString.from(buffer))///
-//       val nextPos = position + readCount
-//       channel.read(buffer, nextPos, buffer.clear(),
-//         ReadCompletionHandler(channel, sink, nextPos, blockSize))
-//     else
-//       sink.complete();
-
-//   def failed(error: Throwable, buffer: ByteBuffer): Unit =
-//     sink.error(error)
