@@ -1,21 +1,13 @@
 package urwerk.io.file
 
-import org.reactivestreams.{Subscriber, Subscription}
-import reactor.core.publisher.Flux
-
 import urwerk.io
-import urwerk.io.ByteString
-import urwerk.io.ByteSeq
-import urwerk.source.{SingletonSource, Source}
-import urwerk.source.test.SourceVerifier
-import urwerk.test.{TestBase, uniqueDirectory, uniqueFile, uniquePath}
 
-import java.net.URI
-import java.nio.ByteBuffer
-import java.nio.channels.ReadableByteChannel
-import java.nio.file.attribute.BasicFileAttributes
+import urwerk.source.test.SourceVerifier
+import urwerk.test.{TestBase, uniqueFile, uniquePath}
+
 import java.nio.file.Files
 import java.nio.file.NoSuchFileException
+import java.nio.file.StandardOpenOption
 
 import scala.concurrent.ExecutionContext
 import scala.util.Random
@@ -29,18 +21,17 @@ class FileTest extends TestBase:
     val file = uniqueFile
     val blockSize: Int = Files.getFileStore(file).getBlockSize.toInt
     
-    val givenBytes = Random.nextBytes(blockSize * 3)
-    val givenByteStrings = Seq(
-      ByteSeq.unsafeWrap(givenBytes, 0, blockSize),
-      ByteSeq.unsafeWrap(givenBytes, blockSize, blockSize),
-      ByteSeq.unsafeWrap(givenBytes, blockSize * 2, blockSize))
-    
-    Files.write(file, givenBytes)
+    val givenBlocks = for i <- 0 to 3 
+      yield Random.nextBytes(blockSize)
 
-    val actualBytes = file.byteSource()
+    givenBlocks.foreach{block =>
+      Files.write(file, block, StandardOpenOption.APPEND)
+    }
+
+    val actualBlocks = file.byteSource()
       .toSeq.block
 
-    actualBytes should be(givenByteStrings)
+    actualBlocks should be(givenBlocks.map(_.toSeq))
   }
 
   "create byte source with custom block size" in {
@@ -50,7 +41,6 @@ class FileTest extends TestBase:
     val file = uniqueFile(givenBytes)
 
     val actualBuffers = file.byteSource(1)
-    .doOnNext(block => println(s"BLOCK ${block(0)}"))
     .toSeq.block
     actualBuffers should be (givenBuffers)
   }

@@ -12,10 +12,10 @@ import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.ExecutionContextExecutorService
 import scala.jdk.CollectionConverters.given
 
-import urwerk.io.ByteSeq
-import urwerk.io.ByteString
 import urwerk.source.Sink
 import urwerk.source.Source
+import scala.collection.compat.immutable.ArraySeq
+import scala.languageFeature.postfixOps
 
 extension (file: Path)(using ec: ExecutionContext)
   def byteSource(): Source[Seq[Byte]] =
@@ -52,23 +52,42 @@ private def read(file: Path, blockSize: Int)(using ec: ExecutionContext): Source
     Source.create{sink =>
       val bs = if blockSize <=0 then Files.getFileStore(file).getBlockSize.toInt
         else blockSize
+      
       val buffer = ByteBuffer.allocate(bs.toInt)
-      channel.read(buffer, 0, buffer, ReadCompletionHandler(channel, sink, 0, blockSize.toInt))
+      read(channel, sink, 0, buffer)
     }
   }
 
-private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], val position: Long, blockSize: Int) extends CompletionHandler[Integer, ByteBuffer]:
-  
-  def completed(readCount: Integer, buffer: ByteBuffer): Unit =
-    if readCount >= 0 then
-      buffer.flip()
-      if buffer.limit() > 0 then
-        sink.next(ByteString.from(buffer))///
-      val nextPos = position + readCount
-      channel.read(buffer, nextPos, buffer.clear(),
-        ReadCompletionHandler(channel, sink, nextPos, blockSize))
-    else
-      sink.complete();
+private def read(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], position: Long, buffer: ByteBuffer): Unit = 
+  buffer.clear()
+  channel.read(buffer, position, buffer, new CompletionHandler:
+    def completed(readCount: Integer, buffer: ByteBuffer): Unit =
+      if readCount < 0 then
+        sink.complete()
+        
+      else
+        buffer.flip()
+        val bytes = Array.ofDim[Byte](buffer.remaining)
+        buffer.get(bytes)
+        sink.next(ArraySeq.unsafeWrapArray(bytes))
+        read(channel, sink, position + readCount, buffer)
 
-  def failed(error: Throwable, buffer: ByteBuffer): Unit =
-    sink.error(error)
+    def failed(error: Throwable, buffer: ByteBuffer): Unit =
+      sink.error(error)
+  )
+
+// private class ReadCompletionHandler(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], val position: Long, blockSize: Int) extends CompletionHandler[Integer, ByteBuffer]:
+  
+//   def completed(readCount: Integer, buffer: ByteBuffer): Unit =
+//     if readCount >= 0 then
+//       buffer.flip()
+//       if buffer.limit() > 0 then
+//         sink.next(ByteString.from(buffer))///
+//       val nextPos = position + readCount
+//       channel.read(buffer, nextPos, buffer.clear(),
+//         ReadCompletionHandler(channel, sink, nextPos, blockSize))
+//     else
+//       sink.complete();
+
+//   def failed(error: Throwable, buffer: ByteBuffer): Unit =
+//     sink.error(error)
