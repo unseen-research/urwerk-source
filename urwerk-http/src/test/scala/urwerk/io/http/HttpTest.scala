@@ -10,4 +10,10 @@ class FileTest extends TestBase:
     // Http.Get(url="abc").response
 
     // Http.Get(url="abc").string
+
+    // Http.Request.set(
+    //   Url := "url",
+    //   attribute/Size := 5
+    //   attribute/ContentSize := "json"
+    // )
   }
