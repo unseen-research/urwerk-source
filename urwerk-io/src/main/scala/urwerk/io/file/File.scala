@@ -15,7 +15,6 @@ import scala.jdk.CollectionConverters.given
 import urwerk.source.Sink
 import urwerk.source.Source
 import scala.collection.compat.immutable.ArraySeq
-import scala.languageFeature.postfixOps
 
 extension (file: Path)(using ec: ExecutionContext)
   def bytes: Source[Seq[Byte]] =
@@ -45,17 +44,14 @@ private def read(file: Path)(using ec: ExecutionContext): Source[Seq[Byte]] =
   read(file, -1).subscribeOn(ec)
 
 private def read(file: Path, blockSize: Int)(using ec: ExecutionContext): Source[Seq[Byte]] =
-  def openChannel() =
-    AsynchronousFileChannel.open(file, Set(StandardOpenOption.READ).asJava, ec.toExecutorService)
+  Source.create{sink =>
+    val bs = if blockSize <=0 then Files.getFileStore(file).getBlockSize.toInt
+      else blockSize
 
-  Source.using(openChannel(), _.close()){channel =>
-    Source.create{sink =>
-      val bs = if blockSize <=0 then Files.getFileStore(file).getBlockSize.toInt
-        else blockSize
-      
-      val buffer = ByteBuffer.allocate(bs.toInt)
-      read(channel, sink, 0, buffer)
-    }
+    val channel = AsynchronousFileChannel.open(file, Set(StandardOpenOption.READ).asJava, ec.toExecutorService)  
+    val buffer = ByteBuffer.allocate(bs.toInt)
+
+    read(channel, sink, 0, buffer)
   }
 
 private def read(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], position: Long, buffer: ByteBuffer): Unit = 
@@ -64,7 +60,7 @@ private def read(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], positi
     def completed(readCount: Integer, buffer: ByteBuffer): Unit =
       if readCount < 0 then
         sink.complete()
-        
+        channel.close()
       else
         buffer.flip()
         val bytes = Array.ofDim[Byte](buffer.remaining)
@@ -74,4 +70,5 @@ private def read(channel: AsynchronousFileChannel, sink: Sink[Seq[Byte]], positi
 
     def failed(error: Throwable, buffer: ByteBuffer): Unit =
       sink.error(error)
+      channel.close()
   )
