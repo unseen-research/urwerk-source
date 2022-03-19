@@ -80,7 +80,9 @@ lazy val urwerkHttp = project
     scalaVersion := DottyVersion,
     scalacOptions ++= commonScalacOptions,
 
-    libraryDependencies ++= commonDependencies,
+    libraryDependencies ++= commonDependencies ++ Seq(
+      "com.github.tomakehurst" % "wiremock-jre8" % "2.32.0" % "test"
+    ),
     
     publishTo :=  Some("nexus" at publishRepositoryUrl)
   )

@@ -4,6 +4,7 @@ import java.net.URI
 
 type Uri = URI
 
+class UURRII
 object Uri {
   def apply(uri: String): Uri = {
     new Uri(uri)

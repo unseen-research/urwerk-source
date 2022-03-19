@@ -44,4 +44,3 @@ def uniqueFile(bytes: Array[Byte]): file.Path =
 
 def uniqueFile(content: String)(using codec: Codec): file.Path =
   Files.writeString(uniqueFile, content, codec.charSet)
-
