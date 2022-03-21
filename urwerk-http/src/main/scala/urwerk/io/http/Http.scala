@@ -10,7 +10,7 @@ import java.util.{List => juList}
 import java.util.concurrent.Flow.Publisher
 
 import scala.collection.compat.immutable.ArraySeq
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 import urwerk.io.Uri
 import urwerk.source.Source
@@ -34,13 +34,19 @@ trait Attributes
 trait AttributeSpec[A <: String]:
   type V
 
-trait Response:
-  def attribute[A <: String](using as: AttributeSpec[A]): as.V
-
 trait Http:
 
   def get(uri: String): Requester = new Requester{
     def bytes: Source[Seq[Byte]] = 
+      response
+        .doOnNext{response => 
+          val statusCode = response.statusCode
+          if statusCode > 299 then
+            throw HttpStatusException(statusCode)
+        }
+        .flatMap(_.content)
+
+    def response: SingletonSource[Response] = 
       val client = HttpClient.newBuilder()
         .build()
 
@@ -52,21 +58,11 @@ trait Http:
       val reponseFuture = client.sendAsync(request, BodyHandlers.ofPublisher())
 
       SingletonSource.from(reponseFuture)   
-        .flatMap(response => mapContent(response))
+        .map(Response.fromHttResponse)
   }
 
-  private def mapContent(response: HttpResponse[Publisher[juList[ByteBuffer]]]): Source[Seq[Byte]] =
+  private def xxx(response: HttpResponse[Publisher[juList[ByteBuffer]]]): Response = ???
 
-    Source.from(response.body)
-      .flatMap{buffers =>
-        Source.from(buffers.asScala)}
-      .map{buffer => 
-        val bytes = Array.ofDim[Byte](buffer.remaining)
-        buffer.get(bytes)
-        ArraySeq.unsafeWrapArray(bytes)
-      }
-
-  
   def apply(uri: String): Requester = ???
   
   def request(uri: Uri, method: Method = Method.Get): Requester = ???
@@ -80,4 +76,4 @@ trait Requester:
 
   // def lines: Source[Seq[String]]
 
-  // def response: SingletonSource[Response]
+  def response: SingletonSource[Response]
