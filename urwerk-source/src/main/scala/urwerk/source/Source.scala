@@ -23,8 +23,10 @@ object Source extends SourceFactory:
 
 trait Source[+A]:
 
-  def addContext(context: Context): Source[A]
-  
+  def updatedContext(context: Context): Source[A]
+
+  def updatedContextWith(op: Context => Context): Source[A]
+
   def cache: Source[A]
 
   def concat[B](implicit evidence: Source[A] <:< Source[Source[B]]): Source[B]

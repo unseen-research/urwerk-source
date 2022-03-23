@@ -14,11 +14,19 @@ trait Context:
 
   def iterator: Iterator[(Any, Any)]
 
+  def removed(key: Any): Context
+
   def size: Int
 
   def toSeq: Seq[(Any, Any)]
 
   def toMap: Map[Any, Any]
 
-  //default <T> T 	get(Class<T> key)
-  //Resolve a value given a type key within the Context.
+  def updated(key: Any, value: Any): Context
+
+trait ContextFactory:
+  def apply(elems: (Any, Any)*): Context
+
+  def empty: Context
+
+  def from[K, V](it: IterableOnce[(Any, Any)]): Context
