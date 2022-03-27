@@ -1,5 +1,16 @@
 package urwerk.source
 
+import urwerk.source.internal.FluxContext
+
+object Context:
+  def apply(elems: (Any, Any)*): Context =
+    FluxContext(elems*)
+
+  def from(map: Map[Any, Any]): Context =
+    FluxContext.from(map)
+
+  def from(it: IterableOnce[(Any, Any)]): Context =
+    FluxContext.from(it)
 
 trait Context:
   def apply(key: Any): Any

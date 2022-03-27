@@ -1,30 +1,18 @@
 package urwerk.source.internal
 
-import java.util.function.{BiConsumer, BiFunction}
-import java.util.concurrent.Flow
-
 import org.reactivestreams.FlowAdapters
-
 import reactor.adapter.JdkFlowAdapter
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
+
+import java.util.concurrent.Flow
 import reactor.core.publisher.SynchronousSink
+import urwerk.source.{BackPressureStrategy, Source}
+import urwerk.source.reactor.FluxConverters.*
 
 import scala.jdk.CollectionConverters.given
 import scala.jdk.FunctionConverters.given
 
-import urwerk.source.BackPressureStrategy
-import urwerk.source.Source
-import urwerk.source.reactor.FluxConverters.*
-import urwerk.source.OptionSource
-import urwerk.source.SingletonSource
-import urwerk.source.Signal
-import urwerk.source.Sink
-import urwerk.source.SourceFactory
-import urwerk.source.internal.given
-import java.util.concurrent.Callable
-import org.reactivestreams.Publisher
-import java.util.function.Consumer
+import urwerk.source.{Context, Sink, SourceFactory}
 
 private[source] object FluxSource extends SourceFactory:
   def apply[A](elems: A*): Source[A] = wrap(Flux.just(elems:_*))
@@ -101,3 +89,10 @@ private class FluxSource[+A](flux: Flux[_<: A]) extends FluxSourceOps[A](flux), 
 
   def filterNot(pred: A => Boolean): Source[A] =
     filter(!pred(_))
+
+  def updatedContext(context: Context): Source[A] =
+    ???
+    //flux.contextWrite()
+
+
+  def updatedContextWith(op: Context => Context): Source[A] = ???

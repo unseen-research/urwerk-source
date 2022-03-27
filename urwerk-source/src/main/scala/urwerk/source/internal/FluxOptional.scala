@@ -5,6 +5,7 @@ import urwerk.source.OptionSource
 
 import scala.jdk.OptionConverters.*
 import urwerk.source.OptionalFactory
+import urwerk.source.Context
 
 private[source] object FluxOptional extends OptionalFactory:
   def apply[A](elem: A): OptionSource[A] =
@@ -42,3 +43,7 @@ private class FluxOptional[+A](flux: Flux[_<: A]) extends FluxSourceOps[A](flux)
 
   override def filterNot(pred: A => Boolean): OptionSource[A] =
     filter(!pred(_))
+
+  def updatedContext(context: Context): OptionSource[A] = ???
+
+  def updatedContextWith(op: Context => Context): OptionSource[A] = ???

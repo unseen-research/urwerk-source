@@ -18,6 +18,7 @@ import urwerk.source.SingletonSource
 import urwerk.source.SingletonFactory
 import urwerk.source.SourceException
 import scala.collection.View.Single
+import urwerk.source.Context
 
 private[source] object FluxSingleton extends SingletonFactory:
 
@@ -65,3 +66,7 @@ private class FluxSingleton[+A](flux: Flux[? <: A]) extends FluxSourceOps[A](flu
 
   def filterNot(pred: A => Boolean): OptionSource[A] =
     filter(!pred(_))
+
+  def updatedContext(context: Context): SingletonSource[A] = ???
+
+  def updatedContextWith(op: Context => Context): SingletonSource[A] = ???
