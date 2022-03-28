@@ -40,16 +40,21 @@ object FluxContext:
 
     def size: Int = context.size()
 
-    def toSeq: Seq[(Any, Any)] =
-      if isEmpty then
-        Seq()
-      else iterator.toSeq
-
     def toMap: Map[Any, Any] =
       if isEmpty then
         Map()
       else
         iterator.toMap
 
+    def toSeq: Seq[(Any, Any)] =
+      if isEmpty then
+        Seq()
+      else iterator.toSeq
+
+    def toSet: Set[(Any, Any)] =
+      if isEmpty then
+        Set()
+      else iterator.toSet
+    
     def updated(key: Any, value: Any): Context =
       wrap(ReactorContext.of(context).put(key, value))

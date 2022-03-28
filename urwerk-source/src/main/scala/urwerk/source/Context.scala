@@ -29,15 +29,10 @@ trait Context:
 
   def size: Int
 
-  def toSeq: Seq[(Any, Any)]
-
   def toMap: Map[Any, Any]
 
+  def toSeq: Seq[(Any, Any)]
+
+  def toSet: Set[(Any, Any)]
+  
   def updated(key: Any, value: Any): Context
-
-trait ContextFactory:
-  def apply(elems: (Any, Any)*): Context
-
-  def empty: Context
-
-  def from[K, V](it: IterableOnce[(Any, Any)]): Context
