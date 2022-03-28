@@ -1,11 +1,11 @@
 package urwerk.source.internal
 
-import reactor.core.publisher.Signal as ReactorSignal
+import reactor.core.publisher.Signal as UnderlyingSignal
 import urwerk.source.Signal
 import urwerk.source.Signal.{Next, Complete, Error}
 
 private object FluxSignal:
-  def apply[A](signal: ReactorSignal[A]): Signal[A] =
+  def wrap[A](signal: UnderlyingSignal[A]): Signal[A] =
     if signal.isOnError() then
         Error(signal.getThrowable())
     else if signal.isOnNext() then

@@ -48,19 +48,22 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
       flux.asInstanceOf[Flux[A1]]
         .concatWith(other.toFlux))
 
-  // def dematerialize[B](implicit evidence: Source[A] <:< Source[Signal[B]]): Source[B] =
-  //   takeWhile{
-  //     case Signal.Next(value) => true
-  //     case Signal.Complete => false
-  //     case Signal.Error(ex) =>
-  //       throw ex
-  //   }
-  //   .map{_.asInstanceOf[Signal.Next[B]].value}
-
+  def dematerialize[B](implicit evidence: Source[A] <:< Source[Signal[B]]): S[B] =
+//    flux.map(_.)
+//    wrap(flux
+//      .map(signal => FluxSignal.wrap(signal.as))
+//      .dematerialize.asInstanceOf[Flux[B]])
+    ???
+    
   def distinct: S[A] = wrap(flux.distinct)
 
   def doOnComplete(op: => Unit): S[A] =
     wrap(flux.doOnComplete(() => op))
+
+  def doOnEach(op: Signal[A] => Unit): S[A] =
+    wrap(
+      flux.doOnEach(signal => 
+        FluxSignal.wrap(signal)))
 
   def doOnError(op: Throwable => Unit): S[A] =
     wrap(
@@ -126,7 +129,7 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
 
   def materialize: S[Signal[A]] =
     wrap(
-      flux.materialize.map(signal => FluxSignal(signal)))
+      flux.materialize.map(signal => FluxSignal.wrap(signal)))
 
   def merge[A1 >: A](that: Source[A1]): Source[A1] =
     FluxSource.wrap((

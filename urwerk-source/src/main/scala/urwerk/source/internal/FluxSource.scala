@@ -13,6 +13,9 @@ import scala.jdk.CollectionConverters.given
 import scala.jdk.FunctionConverters.given
 
 import urwerk.source.{Context, Sink, SourceFactory}
+import urwerk.source.internal.FluxContext.toFluxContext
+import urwerk.source.internal.FluxContext
+import reactor.util.context.Context as UnderlyingContext
 
 private[source] object FluxSource extends SourceFactory:
   def apply[A](elems: A*): Source[A] = wrap(Flux.just(elems:_*))
@@ -91,8 +94,14 @@ private class FluxSource[+A](flux: Flux[_<: A]) extends FluxSourceOps[A](flux), 
     filter(!pred(_))
 
   def updatedContext(context: Context): Source[A] =
-    ???
-    //flux.contextWrite()
+    wrap(
+      flux.contextWrite(context.toFluxContext))
 
-
-  def updatedContextWith(op: Context => Context): Source[A] = ???
+  def updatedContextWith(op: Context => Context): Source[A] =
+    val newFlux = flux
+      .contextWrite{ context =>
+        val newContext = op(FluxContext.wrap(context))
+          .toFluxContext
+        UnderlyingContext.of(newContext)
+      }
+    wrap(newFlux)

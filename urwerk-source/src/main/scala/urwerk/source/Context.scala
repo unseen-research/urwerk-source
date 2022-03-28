@@ -34,5 +34,5 @@ trait Context:
   def toSeq: Seq[(Any, Any)]
 
   def toSet: Set[(Any, Any)]
-  
+
   def updated(key: Any, value: Any): Context

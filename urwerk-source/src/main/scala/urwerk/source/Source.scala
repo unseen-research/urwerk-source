@@ -31,11 +31,13 @@ trait Source[+A]:
 
   def concatDelayError[B](implicit evidence: Source[A] <:< Source[Source[B]]): Source[B]
 
-  //def dematerialize[B](implicit evidence: Source[A] <:< Source[Signal[B]]): Source[B]
+  def dematerialize[B](implicit evidence: Source[A] <:< Source[Signal[B]]): Source[B]
 
   def distinct: Source[A]
 
   def doOnComplete(op: => Unit): Source[A]
+
+  def doOnEach(op: Signal[A] => Unit): Source[A]
 
   def doOnError(op: Throwable => Unit): Source[A]
 

@@ -374,6 +374,14 @@ class SourceTest extends TestBase:
     elems should be (Seq(Next(1), Next(2), Next(3), Complete))
   }
 
+  "dematerialize" in {
+    val elems = Source(1, 2, 3)
+      .materialize
+      .dematerialize
+      .toSeq.block
+    elems should be (Seq(1, 2, 3))
+  }
+
   // "dematerialize" in {
   //   val elems = Source(1, 2, 3).materialize
   //     .dematerialize
@@ -742,4 +750,12 @@ class SourceTest extends TestBase:
 
     src.last.block should be ("B")
     disposeRes should be ("B")
+  }
+
+  "update context" in {
+
+    Source(1, 2, 3)
+      .doOnEach(signal => ???)
+      .updatedContext(Context("abc" -> "ABC"))
+      .last.block
   }

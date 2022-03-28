@@ -77,20 +77,20 @@ class FluxContextTest extends TestBase:
     context.contains("def") should be (true)
   }
 
-  "to seq" in {
-    val seq = FluxContext.wrap(ReactorContext.of("abc", "ABC", "def", "DEF")).toSeq
-
-    seq should be (Seq("abc" -> "ABC", "def" -> "DEF"))
-  }
-
   "to map" in {
     val map = FluxContext.wrap(ReactorContext.of("abc", "ABC", "def", "DEF")).toMap
 
     map should be (Map("abc" -> "ABC", "def" -> "DEF"))
   }
 
+  "to seq" in {
+    val seq = FluxContext.wrap(ReactorContext.of("abc", "ABC", "def", "DEF")).toSeq
+
+    seq should be (Seq("abc" -> "ABC", "def" -> "DEF"))
+  }
+
   "to set" in {
-    val set = FluxContext.wrap(ReactorContext.of("abc", "ABC", "def", "DEF")).toMap
+    val set = FluxContext.wrap(ReactorContext.of("abc", "ABC", "def", "DEF")).toSet
 
     set should be (Set("abc" -> "ABC", "def" -> "DEF"))
   }
