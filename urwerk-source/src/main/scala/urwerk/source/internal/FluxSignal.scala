@@ -13,3 +13,10 @@ private object FluxSignal:
     else if signal.isOnComplete() then
         Complete
     else throw UnsupportedOperationException()
+
+
+class FluxSignal[+A](underlying: UnderlyingSignal[A])
+
+
+
+
