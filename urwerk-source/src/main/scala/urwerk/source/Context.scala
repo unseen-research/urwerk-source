@@ -6,6 +6,8 @@ object Context:
   def apply(elems: (Any, Any)*): Context =
     FluxContext(elems*)
 
+  def empty: Context = apply()
+
   def from(map: Map[Any, Any]): Context =
     FluxContext.from(map)
 

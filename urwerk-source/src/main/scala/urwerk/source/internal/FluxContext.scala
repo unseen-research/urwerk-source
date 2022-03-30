@@ -68,3 +68,14 @@ private [internal] class FluxContext(context: UnderlyingContextView) extends Con
     wrap(UnderlyingContext.of(context).put(key, value))
 
   def underlyingContext: UnderlyingContextView = context
+
+  def canEqual(a: Any) = a.isInstanceOf[Context]
+
+  override def equals(that: Any): Boolean =
+    that match
+      case that: Context =>
+        this.toMap == that.toMap
+      case _ => false
+
+  override def hashCode: Int =
+    this.toMap.hashCode

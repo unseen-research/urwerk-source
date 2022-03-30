@@ -63,7 +63,7 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
   def doOnEach(op: Signal[A] => Unit): S[A] =
     wrap(
       flux.doOnEach(signal => 
-        FluxSignal.wrap(signal)))
+        SignalConverter.fromUnderlying(signal)))
 
   def doOnError(op: Throwable => Unit): S[A] =
     wrap(
@@ -129,7 +129,7 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
 
   def materialize: S[Signal[A]] =
     wrap(
-      flux.materialize.map(signal => FluxSignal.wrap(signal)))
+      flux.materialize.map(signal => SignalConverter.fromUnderlying(signal)))
 
   def merge[A1 >: A](that: Source[A1]): Source[A1] =
     FluxSource.wrap((
