@@ -1,28 +1,21 @@
 package urwerk.source.internal
 
+import org.reactivestreams.{FlowAdapters, Publisher}
+import reactor.adapter.JdkFlowAdapter
+import reactor.core.publisher.{Flux, FluxCreate, Mono}
+import reactor.core.scheduler.Schedulers
+import reactor.util.context.Context as UnderlyingContext
+import urwerk.source.internal.{ContextAdapter, given}
+import urwerk.source.reactor.FluxConverters
+import urwerk.source.reactor.FluxConverters.*
+import urwerk.source.*
+
 import java.util.concurrent.Flow
 import java.util.function.{BiConsumer, BiFunction}
-
-import org.reactivestreams.FlowAdapters
-import org.reactivestreams.Publisher
-
-import reactor.adapter.JdkFlowAdapter
-import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxCreate
-import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
-
 import scala.concurrent.ExecutionContext
-import scala.jdk.FunctionConverters.*
 import scala.jdk.CollectionConverters.*
+import scala.jdk.FunctionConverters.*
 
-import urwerk.source.reactor.FluxConverters.*
-import urwerk.source.OptionSource
-import urwerk.source.SingletonSource
-import urwerk.source.Source
-import urwerk.source.Signal
-import urwerk.source.internal.given
-import urwerk.source.BufferOverflowStrategy
 
 private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
   type  S[+ _]
@@ -49,12 +42,12 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
         .concatWith(other.toFlux))
 
   def dematerialize[B](implicit evidence: Source[A] <:< Source[Signal[B]]): S[B] =
-//    flux.map(_.)
-//    wrap(flux
-//      .map(signal => FluxSignal.wrap(signal.as))
-//      .dematerialize.asInstanceOf[Flux[B]])
-    ???
-    
+    wrap(flux
+      .map(signal =>
+        signal.asInstanceOf[Signal[A]])
+      .map(signal => SignalConverter.toUnderlying(signal))
+      .dematerialize())
+
   def distinct: S[A] = wrap(flux.distinct)
 
   def doOnComplete(op: => Unit): S[A] =
@@ -62,8 +55,8 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
 
   def doOnEach(op: Signal[A] => Unit): S[A] =
     wrap(
-      flux.doOnEach(signal => 
-        SignalConverter.fromUnderlying(signal)))
+      flux.doOnEach(signal =>
+        op(SignalConverter.fromUnderlying(signal))))
 
   def doOnError(op: Throwable => Unit): S[A] =
     wrap(
@@ -236,3 +229,16 @@ private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
     FluxSingleton.wrap(flux
       .collectList
       .flux.map(_.asScala.toSeq))
+
+  def updatedContext(context: Context): S[A] =
+    wrap(
+      flux.contextWrite(
+        ContextConverter.toUnderlying(context)))
+
+  def updatedContextWith(map: Context => Context): S[A] =
+    wrap(flux
+      .contextWrite{ context =>
+        val newContext = map(ContextAdapter.wrap(context))
+        val underlyingContextView = ContextConverter.toUnderlying(newContext)
+        UnderlyingContext.of(underlyingContextView)
+      })

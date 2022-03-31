@@ -2,12 +2,22 @@ package urwerk.source.internal
 
 import reactor.util.context.{ContextView as UnderlyingContextView, Context as UnderlyingContext}
 import urwerk.source.Context
-import urwerk.source.internal.FluxContext.*
+import urwerk.source.internal.ContextAdapter.*
 
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
 
-object FluxContext:
+object ContextConverter:
+  def fromUnderlying(context: UnderlyingContextView): Context =
+    ContextAdapter.wrap(context)  
+
+  def toUnderlying(context: Context): UnderlyingContextView =
+    if context.isInstanceOf[ContextAdapter] then
+      context.asInstanceOf[ContextAdapter].underlyingContext
+    else
+      UnderlyingContext.of(context.toMap.asJava)
+
+object ContextAdapter:
   def apply(elems: (Any, Any)*): Context =
     from(elems.toMap)
 
@@ -20,16 +30,9 @@ object FluxContext:
   def from(it: IterableOnce[(Any, Any)]): Context =
     from(it.iterator.toMap)
 
-  def wrap(context: UnderlyingContextView): Context = new FluxContext(context)
+  private[internal] def wrap(context: UnderlyingContextView): Context = new ContextAdapter(context)
 
-  extension (context: Context)
-    def toFluxContext: UnderlyingContextView =
-      context match
-      case context: FluxContext =>
-        context.underlyingContext
-      case _ => ???
-
-private [internal] class FluxContext(context: UnderlyingContextView) extends Context:
+private [internal] class ContextAdapter private (context: UnderlyingContextView) extends Context:
   def apply(key: Any): Any = context.get(key)
 
   def applyOrElse(key: Any, default: Any => Any): Any =

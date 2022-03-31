@@ -66,7 +66,4 @@ private class FluxSingleton[+A](flux: Flux[? <: A]) extends FluxSourceOps[A](flu
 
   def filterNot(pred: A => Boolean): OptionSource[A] =
     filter(!pred(_))
-
-  def updatedContext(context: Context): SingletonSource[A] = ???
-
-  def updatedContextWith(op: Context => Context): SingletonSource[A] = ???
+    

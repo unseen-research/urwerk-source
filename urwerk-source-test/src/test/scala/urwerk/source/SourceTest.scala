@@ -12,7 +12,7 @@ import _root_.reactor.test.StepVerifier
 import _root_.reactor.test.StepVerifierOptions
 import _root_.reactor.test.publisher.TestPublisher
 
-import scala.collection.mutable.ListBuffer
+import scala.collection.mutable.Buffer
 import scala.util.{Failure, Success}
 import scala.util.Random
 
@@ -168,6 +168,14 @@ class SourceTest extends TestBase:
       .verify()
   }
 
+  "dematerialize" in {
+    val elems = Source(1, 2, 3)
+      .materialize
+      .dematerialize
+      .toSeq.block
+    elems should be (Seq(1, 2, 3))
+  }
+
   "distinct" in {
     Source(true, false, true, false, true, false).distinct
       .toVerifier
@@ -185,6 +193,15 @@ class SourceTest extends TestBase:
     completed should be (true)
   }
 
+  "do on each" in {
+    val signals: Buffer[Signal[?]] = Buffer()
+    Source(1, 2)
+      .doOnEach(signal => signals += signal)
+        .last.block
+
+    signals should be (Buffer(Next(1), Next(2), Complete()))
+  }
+
   "do on error" in {
     var error: Throwable = new RuntimeException()
 
@@ -196,7 +213,7 @@ class SourceTest extends TestBase:
   }
 
   "do on next" in {
-    val elems = ListBuffer[Int]()
+    val elems = Buffer[Int]()
 
     Source(1, 2, 3)
       .doOnNext(elem => elems += elem)
@@ -368,19 +385,11 @@ class SourceTest extends TestBase:
     elems should be (Seq("1", "2", "3"))
   }
 
-//  "materialize" in {
-//    val elems = Source(1, 2, 3).materialize
-//      .toSeq.block
-//    elems should be (Seq(Next(1), Next(2), Next(3), Complete))
-//  }
-//
-//  "dematerialize" in {
-//    val elems = Source(1, 2, 3)
-//      .materialize
-//      .dematerialize
-//      .toSeq.block
-//    elems should be (Seq(1, 2, 3))
-//  }
+  "materialize" in {
+    val elems = Source(1, 2, 3).materialize
+      .toSeq.block
+    elems should be (Seq(Next(1), Next(2), Next(3), Complete()))
+  }
 
   "merge with other" in {
     val elems = Source(1, 2, 3).merge(
@@ -553,7 +562,7 @@ class SourceTest extends TestBase:
   }
 
   "subscribe" in {
-    val elems = ListBuffer[String]()
+    val elems = Buffer[String]()
     Source(1, 2, 3)
       .doOnNext(elem => elems += elem.toString)
       .doOnComplete(elems += "completed")
@@ -582,7 +591,7 @@ class SourceTest extends TestBase:
   }
 
   "subscribe with Flow.Subscriber" in {
-    val items = ListBuffer[String]()
+    val items = Buffer[String]()
 
     Source(1, 2, 3).subscribe(new Flow.Subscriber[Int](){
       def onSubscribe(subscription: Flow.Subscription)={
@@ -599,7 +608,7 @@ class SourceTest extends TestBase:
   }
 
   "subscribe with onNext, onError, onComplete" in {
-    val items = ListBuffer[String]()
+    val items = Buffer[String]()
 
     Source(1, 2, 3).subscribe(onNext =
       items += _.toString,
@@ -737,10 +746,13 @@ class SourceTest extends TestBase:
     disposeRes should be ("B")
   }
 
-//  "update context" in {
-//
-//    Source(1, 2, 3)
-//      .doOnEach(signal => ???)
-//      .updatedContext(Context("abc" -> "ABC"))
-//      .last.block
-//  }
+  "update context" in {
+    var value: Any = ""
+
+    Source(1)
+      .doOnEach(signal => value = signal.context("abc"))
+      .updatedContext(Context("abc" -> "ABC"))
+      .last.block
+
+    value should be ("ABC")
+  }

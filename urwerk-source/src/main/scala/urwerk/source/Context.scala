@@ -1,18 +1,18 @@
 package urwerk.source
 
-import urwerk.source.internal.FluxContext
+import urwerk.source.internal.ContextAdapter
 
 object Context:
   def apply(elems: (Any, Any)*): Context =
-    FluxContext(elems*)
+    ContextAdapter(elems*)
 
   def empty: Context = apply()
 
   def from(map: Map[Any, Any]): Context =
-    FluxContext.from(map)
+    ContextAdapter.from(map)
 
   def from(it: IterableOnce[(Any, Any)]): Context =
-    FluxContext.from(it)
+    ContextAdapter.from(it)
 
 trait Context:
   def apply(key: Any): Any
