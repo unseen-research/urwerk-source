@@ -1,26 +1,16 @@
 package urwerk.source.internal
 
+import reactor.core.publisher.{Flux, Mono}
+import urwerk.source.*
+import urwerk.source.reactor.FluxConverters.*
+
 import java.util.concurrent.CompletableFuture
-
-import reactor.core.publisher.Mono
-import reactor.core.publisher.Flux
-
+import scala.collection.View.Single
 import scala.concurrent.Future
 import scala.jdk.FutureConverters.given
-import scala.util.Try
-import scala.util.Success
-import scala.util.Failure
+import scala.util.{Failure, Success, Try}
 
-import urwerk.source.Source
-import urwerk.source.OptionSource
-import urwerk.source.reactor.FluxConverters.*
-import urwerk.source.SingletonSource
-import urwerk.source.SingletonFactory
-import urwerk.source.SourceException
-import scala.collection.View.Single
-import urwerk.source.Context
-
-private[source] object FluxSingleton extends SingletonFactory:
+private[source] object SingletonSourceAdapter extends SingletonFactory:
 
   def apply[A](elem: A): SingletonSource[A] =
     wrap(Flux.just(elem))
@@ -48,15 +38,15 @@ private[source] object FluxSingleton extends SingletonFactory:
       SingletonSource.error(e)
 
   private[internal] def wrap[A](flux: Flux[A]): SingletonSource[A] =
-    val fluxSingleton = new FluxSingleton(flux)
+    val fluxSingleton = new SingletonSourceAdapter(flux)
     new SingletonSource[A]{
       export fluxSingleton.*
     }
 
-private class FluxSingleton[+A](flux: Flux[? <: A]) extends SourceOpsAdapter[A](flux), SingletonSource[A]:
+private class SingletonSourceAdapter[+A](flux: Flux[? <: A]) extends SourceOpsAdapter[A](flux), SingletonSource[A]:
   type S[A] = SingletonSource[A]
 
-  protected def wrap[B](flux: Flux[? <: B]): SingletonSource[B] = FluxSingleton.wrap(flux)
+  protected def wrap[B](flux: Flux[? <: B]): SingletonSource[B] = SingletonSourceAdapter.wrap(flux)
 
   def block: A =
     stripReactiveException(flux.blockFirst())

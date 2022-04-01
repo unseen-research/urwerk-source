@@ -88,12 +88,12 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
       prefetch))
 
   def foldLeft[B](start: B)(op: (B, A) => B): urwerk.source.SingletonSource[B] =
-    FluxSingleton.wrap(
+    SingletonSourceAdapter.wrap(
       flux.reduce(start,
         op(_, _)).flux)
 
   def head: urwerk.source.SingletonSource[A] =
-    FluxSingleton.wrap(
+    SingletonSourceAdapter.wrap(
       flux
         .next()
         .single().flux())
@@ -104,7 +104,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
         .next().flux())
 
   def last: SingletonSource[A] =
-    FluxSingleton.wrap(
+    SingletonSourceAdapter.wrap(
       flux
         .last().flux())
 
@@ -226,7 +226,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
     JdkFlowAdapter.publisherToFlowPublisher(flux.asInstanceOf[Flux[A1]])
 
   def toSeq: SingletonSource[Seq[A]] =
-    FluxSingleton.wrap(flux
+    SingletonSourceAdapter.wrap(flux
       .collectList
       .flux.map(_.asScala.toSeq))
 

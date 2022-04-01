@@ -1,12 +1,12 @@
 package urwerk.source
 
 import java.util.concurrent.CompletableFuture
-import urwerk.source.internal.FluxSingleton
+import urwerk.source.internal.SingletonSourceAdapter
 import scala.concurrent.Future
 import scala.util.Try
 
 object SingletonSource extends SingletonFactory:
-  export FluxSingleton.*
+  export SingletonSourceAdapter.*
 
 trait SingletonSource[+A] extends Source[A]:
   def block: A
