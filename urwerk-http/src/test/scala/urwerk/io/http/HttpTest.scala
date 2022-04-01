@@ -1,12 +1,10 @@
 package urwerk.io.http
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import urwerk.source.test.SourceVerifier
+import urwerk.test.{HttpServer, TestBase}
 
 import scala.util.Random
-
-import urwerk.source.test.SourceVerifier
-import urwerk.test.TestBase
-import urwerk.test.HttpServer
 
 class HttpTest extends TestBase with HttpServer:
 
@@ -53,9 +51,5 @@ class HttpTest extends TestBase with HttpServer:
       .response.block
 
     response.statusCode should be (203)
-
-    val receivedBytes = Http.get(s"${serverUrl}/get/resource")
-      .bytes.toSeq.block.head
-
-    receivedBytes should be (givenBytes)
+    response.content.toSeq.block.head should be (givenBytes)
   }

@@ -1,20 +1,16 @@
 package urwerk.io.http
 
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpRequest.BodyPublishers
-import java.net.http.HttpResponse.BodyHandlers
-import java.net.http.HttpResponse
-import java.nio.ByteBuffer
-import java.util.{List => juList}
-import java.util.concurrent.Flow.Publisher
+import urwerk.io.Uri
+import urwerk.source.{SingletonSource, Source}
 
+import java.net.http.HttpRequest.BodyPublishers
+import java.net.http.{HttpClient, HttpRequest, HttpResponse}
+import java.net.http.HttpResponse.BodyHandlers
+import java.nio.ByteBuffer
+import java.util.List as juList
+import java.util.concurrent.Flow.Publisher
 import scala.collection.compat.immutable.ArraySeq
 import scala.jdk.CollectionConverters.*
-
-import urwerk.io.Uri
-import urwerk.source.Source
-import urwerk.source.SingletonSource
 
 enum Method(val name: String):
   case Get  extends Method("GET")
