@@ -2,7 +2,7 @@ package urwerk.source
 
 import java.util.concurrent.Flow
 
-import urwerk.source.internal.FluxSource
+import urwerk.source.internal.SourceAdapter
 import _root_.reactor.core.publisher.BufferOverflowStrategy
 import scala.concurrent.ExecutionContext
 
@@ -19,7 +19,7 @@ enum BackPressureStrategy:
   case Latest
 
 object Source extends SourceFactory:
-  export FluxSource.*
+  export SourceAdapter.*
 
 trait Source[+A]:
 

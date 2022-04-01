@@ -5,7 +5,7 @@ import reactor.core.publisher.Flux
 import urwerk.source.Source
 
 import java.util.concurrent.Flow
-import urwerk.source.internal.FluxSource
+import urwerk.source.internal.SourceAdapter
 
 object FluxConverters:
   extension [A](source: Source[A])

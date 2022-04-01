@@ -16,7 +16,7 @@ import urwerk.source.{Context, Sink, SourceFactory}
 import urwerk.source.internal.ContextConverter
 import reactor.util.context.Context as UnderlyingContext
 
-private[source] object FluxSource extends SourceFactory:
+private[source] object SourceAdapter extends SourceFactory:
   def apply[A](elems: A*): Source[A] = wrap(Flux.just(elems:_*))
 
   def create[A](op: Sink[A] => Unit): Source[A] =
@@ -77,14 +77,14 @@ private[source] object FluxSource extends SourceFactory:
         (res) => createSource(res).toFlux,
         (res: B) => disposeResource(res)))
 
-  private[internal] def wrap[A](flux: Flux[A]): Source[A] = new FluxSource[A](flux)
+  private[internal] def wrap[A](flux: Flux[A]): Source[A] = new SourceAdapter[A](flux)
 
-private class FluxSource[+A](flux: Flux[_<: A]) extends SourceOpsAdapter[A](flux), Source[A]:
-  import FluxSource.*
+private class SourceAdapter[+A](flux: Flux[_<: A]) extends SourceOpsAdapter[A](flux), Source[A]:
+  import SourceAdapter.*
 
   type S[A] = Source[A]
 
-  protected def wrap[B](flux: Flux[? <: B]): Source[B] = FluxSource.wrap(flux)
+  protected def wrap[B](flux: Flux[? <: B]): Source[B] = SourceAdapter.wrap(flux)
 
   def filter(pred: A => Boolean): Source[A] =
     wrap(flux.filter(pred(_)))

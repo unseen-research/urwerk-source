@@ -25,19 +25,19 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
   def cache: S[A] = wrap(flux.cache())
 
   def concat[B](implicit evidence: Source[A] <:< Source[Source[B]]): Source[B] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       Flux.concat(
         flux.asInstanceOf[Flux[Source[B]]]
           .map(_.toFlux)))
 
   def concatDelayError[B](implicit evidence: Source[A] <:< Source[Source[B]]): Source[B] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       Flux.concatDelayError(
         flux.asInstanceOf[Flux[Source[B]]]
           .map(_.toFlux)))
 
   def concat[A1 >: A](other: Source[A1]): Source[A1] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       flux.asInstanceOf[Flux[A1]]
         .concatWith(other.toFlux))
 
@@ -67,7 +67,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
       flux.doOnNext(op(_)))
 
   def flatMap[B](op: A => Source[B]): Source[B] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       flux.flatMap(
         op(_).toFlux))
 
@@ -77,12 +77,12 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
         unwrap(op(elem).asInstanceOf[Source[B]])))
 
   def flatMap[B](concurrency: Int)(op: A => Source[B]): Source[B] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       flux.flatMap(op(_).toFlux,
       concurrency))
 
   def flatMap[B](concurrency: Int, prefetch: Int)(op: A => Source[B]): Source[B] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       flux.flatMap(op(_).toFlux,
       concurrency,
       prefetch))
@@ -125,17 +125,17 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
       flux.materialize.map(signal => SignalConverter.fromUnderlying(signal)))
 
   def merge[A1 >: A](that: Source[A1]): Source[A1] =
-    FluxSource.wrap((
+    SourceAdapter.wrap((
       Flux.merge(flux, unwrap(that))))
 
   def merge[B](implicit evidence: Source[A] <:< Source[Source[B]]): Source[B] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       Flux.merge(
         flux.asInstanceOf[Flux[Source[B]]]
           .map(_.toFlux)))
 
   def mergeDelayError[A1 >: A](prefetch: Int, that: Source[A1]): Source[A1] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       Flux.mergeDelayError(prefetch, flux, unwrap(that)))
 
   def mkString(start: String, sep: String, end: String): SingletonSource[String] =
@@ -151,7 +151,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
       flux.onBackpressureBuffer(capacity, overflowStrategy.asJava))
 
   def onErrorContinue(op: (Throwable, Any) => Unit): Source[A] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       flux.onErrorContinue(op.asJava))
 
   def onErrorMap(op: Throwable => Throwable): S[A] =
@@ -159,7 +159,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
       flux.onErrorMap(op.asJava))
 
   def onErrorResume[A1 >: A](op: Throwable => Source[A1]): Source[A1] =
-    FluxSource.wrap(
+    SourceAdapter.wrap(
       flux.asInstanceOf[Flux[A1]]
         .onErrorResume{(e) => op(e).toFlux})
 
