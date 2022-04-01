@@ -1,11 +1,8 @@
 package urwerk.source.internal
 
-import java.util.concurrent.{ AbstractExecutorService, TimeUnit }
 import java.util.Collections
-
-import scala.concurrent.ExecutionContext
-import scala.concurrent.ExecutionContextExecutor
-import scala.concurrent.ExecutionContextExecutorService
+import java.util.concurrent.{AbstractExecutorService, TimeUnit}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, ExecutionContextExecutorService}
 
 extension (executionContext: ExecutionContext)
   def toExecutor: ExecutionContextExecutor = toExecutorService

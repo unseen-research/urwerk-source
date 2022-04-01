@@ -1,9 +1,9 @@
 package urwerk.source
 
-import urwerk.source.internal.FluxOptional
+import urwerk.source.internal.OptionSourceAdapter
 
 object OptionSource extends OptionalFactory:
-  export FluxOptional.*
+  export OptionSourceAdapter.*
 
 trait OptionSource[+A] extends Source[A]:
   def block: Option[A]

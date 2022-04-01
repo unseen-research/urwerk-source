@@ -1,6 +1,6 @@
 package urwerk.source.internal
 
-import reactor.util.context.{ContextView as UnderlyingContextView, Context as UnderlyingContext}
+import reactor.util.context.{Context as UnderlyingContext, ContextView as UnderlyingContextView}
 import urwerk.source.Context
 import urwerk.source.internal.ContextAdapter.*
 

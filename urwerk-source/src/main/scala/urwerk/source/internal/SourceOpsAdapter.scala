@@ -99,7 +99,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
         .single().flux())
 
   def headOption: OptionSource[A] =
-    FluxOptional.wrap(
+    OptionSourceAdapter.wrap(
       flux
         .next().flux())
 
@@ -109,7 +109,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
         .last().flux())
 
   def lastOption: OptionSource[A] =
-    FluxOptional.wrap(
+    OptionSourceAdapter.wrap(
       flux
         .last()
         .onErrorResume(
@@ -176,7 +176,7 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
     def reduceOp[B1 <: A]: BiFunction[B1, B1, B1] = (v1, v2) =>
       op(v1, v2).asInstanceOf[B1]
 
-    FluxOptional.wrap(flux.reduce(reduceOp).flux)
+    OptionSourceAdapter.wrap(flux.reduce(reduceOp).flux)
 
   def scan[B](start: B)(op: (B, A) => B): S[B] =
     wrap(

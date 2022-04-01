@@ -52,7 +52,7 @@ private class SingletonSourceAdapter[+A](flux: Flux[? <: A]) extends SourceOpsAd
     stripReactiveException(flux.blockFirst())
 
   def filter(pred: A => Boolean): OptionSource[A] =
-    FluxOptional.wrap(flux.filter(pred(_)))
+    OptionSourceAdapter.wrap(flux.filter(pred(_)))
 
   def filterNot(pred: A => Boolean): OptionSource[A] =
     filter(!pred(_))
