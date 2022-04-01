@@ -28,7 +28,7 @@ private[source] object FluxOptional extends OptionalFactory:
   private[internal] def wrap[B](flux: Flux[B]): OptionSource[B] =
     new FluxOptional(flux)
 
-private class FluxOptional[+A](flux: Flux[_<: A]) extends FluxSourceOps[A](flux), OptionSource[A]:
+private class FluxOptional[+A](flux: Flux[_<: A]) extends SourceOpsAdapter[A](flux), OptionSource[A]:
 
   type S[A] = OptionSource[A]
 

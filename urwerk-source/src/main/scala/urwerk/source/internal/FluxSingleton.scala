@@ -53,7 +53,7 @@ private[source] object FluxSingleton extends SingletonFactory:
       export fluxSingleton.*
     }
 
-private class FluxSingleton[+A](flux: Flux[? <: A]) extends FluxSourceOps[A](flux), SingletonSource[A]:
+private class FluxSingleton[+A](flux: Flux[? <: A]) extends SourceOpsAdapter[A](flux), SingletonSource[A]:
   type S[A] = SingletonSource[A]
 
   protected def wrap[B](flux: Flux[? <: B]): SingletonSource[B] = FluxSingleton.wrap(flux)

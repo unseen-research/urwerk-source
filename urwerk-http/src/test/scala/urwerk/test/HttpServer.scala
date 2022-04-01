@@ -38,5 +38,5 @@ object WiremockServer:
 
   val serverUrl = s"http://$httpHost:$httpPort"
 
-  scala.sys.addShutdownHook(
-    httpServer.stop())
+//  scala.sys.addShutdownHook(
+//    httpServer.stop())

@@ -5,10 +5,10 @@ import reactor.adapter.JdkFlowAdapter
 import reactor.core.publisher.{Flux, FluxCreate, Mono}
 import reactor.core.scheduler.Schedulers
 import reactor.util.context.Context as UnderlyingContext
+import urwerk.source.*
 import urwerk.source.internal.{ContextAdapter, given}
 import urwerk.source.reactor.FluxConverters
 import urwerk.source.reactor.FluxConverters.*
-import urwerk.source.*
 
 import java.util.concurrent.Flow
 import java.util.function.{BiConsumer, BiFunction}
@@ -17,7 +17,7 @@ import scala.jdk.CollectionConverters.*
 import scala.jdk.FunctionConverters.*
 
 
-private abstract class FluxSourceOps[+A](val flux: Flux[_ <: A]):
+private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
   type  S[+ _]
 
   protected def wrap[B](flux: Flux[? <: B]): S[B]

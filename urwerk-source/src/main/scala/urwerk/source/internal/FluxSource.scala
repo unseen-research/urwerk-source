@@ -21,11 +21,11 @@ private[source] object FluxSource extends SourceFactory:
 
   def create[A](op: Sink[A] => Unit): Source[A] =
     wrap(
-      Flux.create[A](sink => op(FluxSink(sink))))
+      Flux.create[A](sink => op(SinkAdapter(sink))))
 
   def create[A](backpressure: BackPressureStrategy)(op: Sink[A] => Unit): Source[A] =
     wrap(
-      Flux.create[A](sink => op(FluxSink(sink)),
+      Flux.create[A](sink => op(SinkAdapter(sink)),
         backpressure.asJava))
 
   def defer[A](op: => Source[A]): Source[A] =
@@ -49,7 +49,7 @@ private[source] object FluxSource extends SourceFactory:
 
   def push[A](op: Sink[A] => Unit): Source[A] =
     wrap(
-      Flux.push[A](sink => op(FluxSink(sink))))
+      Flux.push[A](sink => op(SinkAdapter(sink))))
 
   def unfold[A, S](init: => S)(op: S => Option[(A, S)]): Source[A] =
     unfold(init, (_) => {})(op)
@@ -79,7 +79,7 @@ private[source] object FluxSource extends SourceFactory:
 
   private[internal] def wrap[A](flux: Flux[A]): Source[A] = new FluxSource[A](flux)
 
-private class FluxSource[+A](flux: Flux[_<: A]) extends FluxSourceOps[A](flux), Source[A]:
+private class FluxSource[+A](flux: Flux[_<: A]) extends SourceOpsAdapter[A](flux), Source[A]:
   import FluxSource.*
 
   type S[A] = Source[A]
