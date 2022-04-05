@@ -57,8 +57,6 @@ trait Http:
         .map(Response.fromHttResponse)
   }
 
-  private def xxx(response: HttpResponse[Publisher[juList[ByteBuffer]]]): Response = ???
-
   def apply(uri: String): Requester = ???
   
   def request(uri: Uri, method: Method = Method.Get): Requester = ???

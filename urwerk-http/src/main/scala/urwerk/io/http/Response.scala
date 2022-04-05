@@ -1,17 +1,16 @@
 package urwerk.io.http
 
+import urwerk.source.Source
+
 import java.net.http.HttpResponse
 import java.nio.ByteBuffer
-import java.util.{List => juList}
+import java.util.List as JavaList
 import java.util.concurrent.Flow.Publisher
-
 import scala.collection.compat.immutable.ArraySeq
 import scala.jdk.CollectionConverters.*
 
-import urwerk.source.Source
-
 object Response:
-  private[http] def fromHttResponse(response: HttpResponse[Publisher[juList[ByteBuffer]]]): Response = 
+  private[http] def fromHttResponse(response: HttpResponse[Publisher[JavaList[ByteBuffer]]]): Response =
     val content = Source.from(response.body)
       .map(_.asScala)
       .flatMap(buffers => Source.from(buffers))
