@@ -11,7 +11,7 @@ import java.util.concurrent.{Executors, Flow}
 import scala.concurrent.ExecutionContext
 
 object RequestContext:
-  private def closeResponseContent(response: Response): Unit =
+  private def cancelResponseContent(response: Response): Unit =
     response.content.subscribe(new Flow.Subscriber{
       def onComplete() = ()
       def onError(throwable: Throwable) = ()
@@ -48,5 +48,5 @@ class RequestContext(request: Request) extends http.RequestContext:
       .flatMap(response =>
         SingletonSource(response)
           .doFinally{()=>
-            closeResponseContent(response)
+            cancelResponseContent(response)
           })
