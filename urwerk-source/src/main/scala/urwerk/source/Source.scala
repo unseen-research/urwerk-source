@@ -35,7 +35,9 @@ trait Source[+A]:
 
   def distinct: Source[A]
 
-  def doOnComplete(op: => Unit): Source[A]
+  def doFinally(op: () => Unit): Source[A]
+
+  def doOnComplete(op: () => Unit): Source[A]
 
   def doOnEach(op: Signal[A] => Unit): Source[A]
 

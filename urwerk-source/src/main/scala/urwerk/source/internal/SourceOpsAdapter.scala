@@ -50,8 +50,11 @@ private abstract class SourceOpsAdapter[+A](val flux: Flux[_ <: A]):
 
   def distinct: S[A] = wrap(flux.distinct)
 
-  def doOnComplete(op: => Unit): S[A] =
-    wrap(flux.doOnComplete(() => op))
+  def doFinally(op: () => Unit): S[A] =
+    wrap(flux.doFinally(_ => op()))
+
+  def doOnComplete(op: () => Unit): S[A] =
+    wrap(flux.doOnComplete(() => op()))
 
   def doOnEach(op: Signal[A] => Unit): S[A] =
     wrap(

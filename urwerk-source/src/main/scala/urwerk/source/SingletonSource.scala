@@ -11,6 +11,16 @@ object SingletonSource extends SingletonFactory:
 trait SingletonSource[+A] extends Source[A]:
   def block: A
 
+  def doFinally(op: () => Unit): SingletonSource[A]
+
+  def doOnComplete(op: () => Unit): SingletonSource[A]
+
+  def doOnEach(op: Signal[A] => Unit): SingletonSource[A]
+
+  def doOnError(op: Throwable => Unit): SingletonSource[A]
+
+  def doOnNext(op: A => Unit): SingletonSource[A]
+
   def filter(pred: A => Boolean): OptionSource[A]
 
   def filterNot(pred: A => Boolean): OptionSource[A]

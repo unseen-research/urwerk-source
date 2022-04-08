@@ -8,6 +8,16 @@ object OptionSource extends OptionalFactory:
 trait OptionSource[+A] extends Source[A]:
   def block: Option[A]
 
+  def doFinally(op: () => Unit): OptionSource[A]
+
+  def doOnComplete(op: () => Unit): OptionSource[A]
+
+  def doOnEach(op: Signal[A] => Unit): OptionSource[A]
+
+  def doOnError(op: Throwable => Unit): OptionSource[A]
+
+  def doOnNext(op: A => Unit): OptionSource[A]
+  
   def filter(pred: A => Boolean): OptionSource[A]
 
   def filterNot(pred: A => Boolean): OptionSource[A]

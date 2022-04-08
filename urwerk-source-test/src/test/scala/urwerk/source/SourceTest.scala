@@ -183,12 +183,22 @@ class SourceTest extends TestBase:
       .verifyComplete()
   }
 
+  "do finally" in {
+    var completed: Boolean = false
+
+    Source()
+      .doFinally{() => completed = true}
+      .lastOption.block
+
+    completed should be (true)
+  }
+
   "do on complete" in {
     var completed: Boolean = false
 
     Source()
-      .doOnComplete{completed = true}
-      .subscribe()
+      .doOnComplete{() => completed = true}
+      .lastOption.block
 
     completed should be (true)
   }
@@ -565,7 +575,7 @@ class SourceTest extends TestBase:
     val elems = Buffer[String]()
     Source(1, 2, 3)
       .doOnNext(elem => elems += elem.toString)
-      .doOnComplete(elems += "completed")
+      .doOnComplete(() => elems += "completed")
       .subscribe()
 
     elems should be(Seq("1", "2", "3", "completed"))

@@ -23,7 +23,10 @@ enum Method(val name: String):
   case Trace extends Method("TRACE")
   case Other(method: String) extends Method(method)
 
-object Http extends Http
+object Http extends Http:
+  private def interceptResponseContentSource(content: Source[Seq[Byte]] => Source[Seq[Byte]]): Source[Seq[Byte]] =
+    ???
+
 
 trait Attributes
 
@@ -31,39 +34,16 @@ trait AttributeSpec[A <: String]:
   type V
 
 trait Http:
+  def get(uri: String): RequestContext = jdk.RequestContext(Request.Get(uri))
 
-  def get(uri: String): Requester = new Requester{
-    def bytes: Source[Seq[Byte]] = 
-      response
-        .doOnNext{response => 
-          val statusCode = response.statusCode
-          if statusCode > 299 then
-            throw HttpStatusException(statusCode)
-        }
-        .flatMap(_.content)
-
-    def response: SingletonSource[Response] = 
-      val client = HttpClient.newBuilder()
-        .build()
-
-      val request = HttpRequest.newBuilder()
-        .method("GET", BodyPublishers.noBody())
-        .uri(Uri(uri))
-        .build
-
-      val reponseFuture = client.sendAsync(request, BodyHandlers.ofPublisher())
-
-      SingletonSource.from(reponseFuture)   
-        .map(Response.fromHttResponse)
-  }
-
-  def apply(uri: String): Requester = ???
+  def apply(uri: String): RequestContext = ???
   
-  def request(uri: Uri, method: Method = Method.Get): Requester = ???
+  def request(uri: Uri, method: Method = Method.Get): RequestContext = ???
 
-  def request(request: Request): Requester = ???
+  def request(request: Request): RequestContext = ???
 
-trait Requester:
+
+trait RequestContext:
   def bytes: Source[Seq[Byte]]
 
   // def string: Source[Seq[String]]
