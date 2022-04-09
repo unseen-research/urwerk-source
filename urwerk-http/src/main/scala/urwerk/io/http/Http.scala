@@ -26,6 +26,8 @@ enum Method(val name: String):
 object Get:
   def apply(uri: String): RequestContext = jdk.RequestContext(Request.Get(uri))
 
+case class Attribute(name: String, value: String)
+
 trait Attributes
 
 trait AttributeSpec[A <: String]:
@@ -33,6 +35,8 @@ trait AttributeSpec[A <: String]:
 
 trait RequestContext:
   def bytes: Source[Seq[Byte]]
+
+  def attribut(name: String) = ???
 
   // def string: Source[Seq[String]]
 

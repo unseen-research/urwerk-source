@@ -49,11 +49,11 @@ class HttpTest extends TestBase with HttpServer:
     httpServer.stubFor(get(s"/get/resource")
       .willReturn(aResponse()
         .withBody(givenBytes)
-        .withStatus(203)))
+        .withStatus(400)))
     
     val responseContent = http.Get(s"${serverUrl}/get/resource")
       .response
-      .filter(_.statusCode == 203)
+      .filter(_.statusCode == 400)
       .flatMap(_.content)
       .toSeq
       .last.block.head
