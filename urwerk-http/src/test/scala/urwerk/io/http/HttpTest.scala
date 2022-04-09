@@ -1,6 +1,7 @@
 package urwerk.io.http
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import urwerk.io.http
 import urwerk.source.test.SourceVerifier
 import urwerk.source.{SingletonSource, Source}
 import urwerk.test.{HttpServer, TestBase}
@@ -17,7 +18,7 @@ class HttpTest extends TestBase with HttpServer:
       .willReturn(aResponse()
         .withBody(givenBytes)))
     
-    val receivedBytes = Http.Get(s"${serverUrl}/$givenUri")
+    val receivedBytes = http.Get(s"${serverUrl}/$givenUri")
       .bytes
       .toSeq.block.head
 
@@ -32,7 +33,7 @@ class HttpTest extends TestBase with HttpServer:
         .withBody(givenBytes)
         .withStatus(404)))
     
-    val body = Http.Get(s"${serverUrl}/get/resource")
+    val body = http.Get(s"${serverUrl}/get/resource")
       .bytes 
     
     SourceVerifier(body)
@@ -50,7 +51,7 @@ class HttpTest extends TestBase with HttpServer:
         .withBody(givenBytes)
         .withStatus(203)))
     
-    val responseContent = Http.Get(s"${serverUrl}/get/resource")
+    val responseContent = http.Get(s"${serverUrl}/get/resource")
       .response
       .filter(_.statusCode == 203)
       .flatMap(_.content)

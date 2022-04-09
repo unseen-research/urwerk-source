@@ -23,23 +23,13 @@ enum Method(val name: String):
   case Trace extends Method("TRACE")
   case Other(method: String) extends Method(method)
 
-object Http:
-  object Get:
-    def apply(uri: String): RequestContext = jdk.RequestContext(Request.Get(uri))
+object Get:
+  def apply(uri: String): RequestContext = jdk.RequestContext(Request.Get(uri))
 
 trait Attributes
 
 trait AttributeSpec[A <: String]:
   type V
-
-trait Http:
- // def get(uri: String): RequestContext = jdk.RequestContext(Request.Get(uri))
-
-  def apply(uri: String): RequestContext = ???
-  
-  def request(uri: Uri, method: Method = Method.Get): RequestContext = ???
-
-  def request(request: Request): RequestContext = ???
 
 trait RequestContext:
   def bytes: Source[Seq[Byte]]
