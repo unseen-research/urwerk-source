@@ -17,7 +17,7 @@ class HttpTest extends TestBase with HttpServer:
       .willReturn(aResponse()
         .withBody(givenBytes)))
     
-    val receivedBytes = Http.get(s"${serverUrl}/$givenUri")
+    val receivedBytes = Http.Get(s"${serverUrl}/$givenUri")
       .bytes
       .toSeq.block.head
 
@@ -32,7 +32,7 @@ class HttpTest extends TestBase with HttpServer:
         .withBody(givenBytes)
         .withStatus(404)))
     
-    val body = Http.get(s"${serverUrl}/get/resource")
+    val body = Http.Get(s"${serverUrl}/get/resource")
       .bytes 
     
     SourceVerifier(body)
@@ -50,7 +50,7 @@ class HttpTest extends TestBase with HttpServer:
         .withBody(givenBytes)
         .withStatus(203)))
     
-    val responseContent = Http.get(s"${serverUrl}/get/resource")
+    val responseContent = Http.Get(s"${serverUrl}/get/resource")
       .response
       .filter(_.statusCode == 203)
       .flatMap(_.content)
