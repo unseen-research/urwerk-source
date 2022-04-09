@@ -11,12 +11,13 @@ class HttpTest extends TestBase with HttpServer:
 
   "http get bytes" in {
     val givenBytes = Random.nextBytes(10)
+    val givenUri = s"get/${Random.nextInt}"
 
-    httpServer.stubFor(get(s"/get/resource")
+    httpServer.stubFor(get(s"/$givenUri")
       .willReturn(aResponse()
         .withBody(givenBytes)))
     
-    val receivedBytes = Http.get(s"${serverUrl}/get/resource")
+    val receivedBytes = Http.get(s"${serverUrl}/$givenUri")
       .bytes
       .toSeq.block.head
 
