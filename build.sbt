@@ -10,6 +10,9 @@ lazy val commonDependencies = Seq(
   "com.outr" %% "scribe" % "3.6.2",
   "com.outr" %% "scribe-slf4j" % "3.6.2",
 
+  "co.fs2" %% "fs2-core" % "3.2.7",
+  "co.fs2" %% "fs2-io" % "3.2.7",
+
   "org.scalatest" %% "scalatest" % "3.2.11" % "test"
 )
 
