@@ -27,7 +27,7 @@ class PathTest extends TestBase:
     }
 
   "make string" in {
-    Path("/abc/def").mkString("(", ",", ")") should be("(abc,def)")
+    //Path("/abc/def").mkString("(", ",", ")") should be("(abc,def)")
   }
 
   Seq(

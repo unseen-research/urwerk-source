@@ -33,7 +33,7 @@ case class Path private (val absolute: Boolean, val elements: Seq[String]):
     val start = if absolute then "/" else ""
     elements.mkString(start, "/", "")
 
-  export elements.*
+  //export elements.*
 
 object Path:
 //  given Conversion[Path, JNFPath] with {

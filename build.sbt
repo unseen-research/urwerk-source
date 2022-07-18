@@ -3,15 +3,23 @@ ThisBuild / version      := "0.1.2-SNAPSHOT"
 
 licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt"))
 
-val DottyVersion = "3.1.1"
+val DottyVersion = "3.1.3"
 val ReactorVersion = "3.4.15"
 
 lazy val commonDependencies = Seq(
   "com.outr" %% "scribe" % "3.6.2",
   "com.outr" %% "scribe-slf4j" % "3.6.2",
 
+  "com.monovore" %% "decline" % "2.2.0",
+
+  "org.typelevel" %% "cats-core" % "2.7.0",
+
   "co.fs2" %% "fs2-core" % "3.2.7",
   "co.fs2" %% "fs2-io" % "3.2.7",
+
+  "org.http4s" %% "http4s-client" % "1.0.0-M32",
+  "org.http4s" %% "http4s-ember-client" % "1.0.0-M32",
+  "org.http4s" %% "http4s-async-http-client" % "1.0.0-M32",
 
   "org.scalatest" %% "scalatest" % "3.2.11" % "test"
 )
