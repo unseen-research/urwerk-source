@@ -13,11 +13,6 @@ class ArgsTest extends TestBase:
 
   val settings = Opts.options[String]("setting", help = "settings help").orEmpty
 
-  val tailOptionsMapped = (lines, file).mapN { (n, files) =>
-    println(s"LOG: Printing the last $n lines from each file in $files!")
-  }
-
-
   val tailOptionsTupled = (lines, file).tupled
 
   val tailSubcommand = Opts.subcommand("tail", help = "Print the few lines of one or more files.") {
@@ -35,8 +30,6 @@ class ArgsTest extends TestBase:
   ) {
     tailSubcommand orElse headSubcommand
   }
-
-
 
   "tail" in {
     val cmd = tailCommand.parse(Seq("tail", "--lines", "55"))
